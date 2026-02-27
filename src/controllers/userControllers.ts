@@ -7,6 +7,18 @@ export const getAllUsers = async (req: Request, res: Response, next: NextFunctio
         return res.status(200).json(users);
 }
 
+//Services pour récuperer un user précis 
+export const getUser = async (req: Request, res: Response, next: NextFunction) => {
+        const id = Number(req.params.id);
+
+        const user = await User.findByPk(id);
+        if (!user) {
+                return res.status(404).json({ message: 'Pas de user ayant cet ID' });
+        }
+
+        return res.status(200).json(user);
+}
+
 export const createUser = async (req: Request, res: Response, next: NextFunction) => {
 
         //déstructuration pour recup que 2 éléments.
