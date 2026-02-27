@@ -9,6 +9,7 @@ import { requestLogger } from './middlewares/loggers.js';
 import { errorHandler } from "./middlewares/errorHandlers.js";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./config/swagger.js";
+import cors from 'cors';
 
 
 
@@ -30,6 +31,8 @@ async function startServer() {
   };
 }
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+app.use(cors()); // Autorise tout le monde (acceptable uniquement en dev)
 
 app.use(express.json());
 
