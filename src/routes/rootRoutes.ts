@@ -1,10 +1,8 @@
 import express from 'express';
-import type { Request, Response } from 'express';
+import * as rootControllers from '../controllers/rootControllers.js'
 
 const router = express.Router();
 
-router.get('/', (req: Request, res: Response) => {
-  res.send('Bienvenue sur mon serveur API');
-});
+router.get('/', rootControllers.showRoot);
 
 export default router;
