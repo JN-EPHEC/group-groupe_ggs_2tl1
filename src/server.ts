@@ -6,7 +6,7 @@ import rootRoutes from './routes/rootRoutes.js';
 import nameRoutes from './routes/nameRoutes.js'
 import sequelize from './config/database.js';
 import { requestLogger } from './middlewares/loggers.js';
-import { errorSender } from "./middlewares/errorHandlers.js";
+import { errorHandler } from "./middlewares/errorHandlers.js";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./config/swagger.js";
 
@@ -45,6 +45,6 @@ app.use('/api/hello', nameRoutes);
 
 app.use('/',express.static('public'));
 
-app.use(errorSender);
+app.use(errorHandler);
 
 startServer();

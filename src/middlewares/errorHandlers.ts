@@ -1,11 +1,15 @@
 // src/middlewares/errorHandlers.ts
 import type { Request, Response, NextFunction } from "express";
 
-export const errorSender = (err: Error & { status?: number },req: Request,res: Response, next: NextFunction) => {
+export const errorHandler = (
+  err: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   console.error(err);
 
-  const status = err.status ?? 500;
-  const message = err.message ?? "Erreur interne du serveur";
-
-  res.status(status).json({ error: message });
+  res.status(500).json({message: 'une erreur s\'est produite'});
 };
+
+export default errorHandler;

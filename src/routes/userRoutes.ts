@@ -12,7 +12,7 @@ const router = express.Router();
  *     tags: [Users]
  *     responses:
  *       200:
- *         description: Succès
+ *         description: caca
  */
 router.get('/', userControllers.getAllUsers);
 
