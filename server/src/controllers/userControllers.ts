@@ -25,6 +25,18 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
         const { firstName, lastName } = req.body;
         const user = await User.create(req.body);
 
+        return res.status(201).json(user);
+}
+
+export const updateUser = async (req: Request, res: Response, next: NextFunction) => {
+        const id = Number(req.params.id);
+        const user = await User.findByPk(id);
+
+        if (!user) {
+                return res.status(404).json({ message: 'Pas de user ayant cet ID' });
+        }
+
+        await user.update(req.body);
         return res.status(200).json(user);
 }
 

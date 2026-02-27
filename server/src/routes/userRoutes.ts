@@ -17,6 +17,8 @@ router.use('/:id', checkIdParam);
  *     responses:
  *       200:
  *         description: Liste des utilisateurs
+ *       500:
+ *         description: Erreur serveur
  */
 router.get('/', userControllers.getAllUsers);
 
@@ -39,6 +41,8 @@ router.get('/', userControllers.getAllUsers);
  *         description: ID invalide
  *       404:
  *         description: Utilisateur introuvable
+ *       500:
+ *         description: Erreur serveur
  */
 router.get('/:id',userControllers.getUser);
 
@@ -60,10 +64,47 @@ router.get('/:id',userControllers.getUser);
  *               lastName:
  *                 type: string
  *     responses:
- *       200:
+ *       201:
  *         description: Utilisateur créé
+ *       500:
+ *         description: Erreur serveur
  */
 router.post('/', userControllers.createUser);
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   put:
+ *     summary: Met à jour un utilisateur par son ID
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Utilisateur mis à jour
+ *       400:
+ *         description: ID invalide
+ *       404:
+ *         description: Utilisateur introuvable
+ *       500:
+ *         description: Erreur serveur
+ */
+router.put('/:id', userControllers.updateUser);
 
 /**
  * @swagger
@@ -84,6 +125,8 @@ router.post('/', userControllers.createUser);
  *         description: ID invalide
  *       404:
  *         description: Utilisateur introuvable
+ *       500:
+ *         description: Erreur serveur
  */
 router.delete('/:id',userControllers.deleteUser);
 
