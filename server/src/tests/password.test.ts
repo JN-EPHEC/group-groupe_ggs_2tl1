@@ -23,6 +23,7 @@ describe("Password Validator - White Box Testing", () => {
             ,25);
         expect(result).toBe(false)
     });
+    
     it("devrait refuser les enfants de moins de 12 ans ET sans majuscules", () => {
         const result = validatePassword("TESTMAUVAIS@123"
             ,5);

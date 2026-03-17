@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1773177924087" clover="3.2.0">
-  <project timestamp="1773177924087" name="All files">
-    <metrics statements="32" coveredstatements="30" conditionals="39" coveredconditionals="37" methods="2" coveredmethods="2" elements="73" coveredelements="69" complexity="0" loc="32" ncloc="32" packages="1" files="2" classes="2"/>
+<coverage generated="1773736882833" clover="3.2.0">
+  <project timestamp="1773736882833" name="All files">
+    <metrics statements="47" coveredstatements="45" conditionals="53" coveredconditionals="51" methods="3" coveredmethods="3" elements="103" coveredelements="99" complexity="0" loc="47" ncloc="47" packages="1" files="3" classes="3"/>
     <file name="password.ts" path="/Users/gregoryly/Desktop/dev3-backend-tp1/server/src/utils/password.ts">
       <metrics statements="16" coveredstatements="16" conditionals="25" coveredconditionals="25" methods="1" coveredmethods="1"/>
       <line num="1" count="1" type="stmt"/>
@@ -39,6 +39,24 @@
       <line num="75" count="12" type="cond" truecount="2" falsecount="0"/>
       <line num="76" count="6" type="stmt"/>
       <line num="79" count="12" type="stmt"/>
+    </file>
+    <file name="userValidator.ts" path="/Users/gregoryly/Desktop/dev3-backend-tp1/server/src/utils/userValidator.ts">
+      <metrics statements="15" coveredstatements="15" conditionals="14" coveredconditionals="14" methods="1" coveredmethods="1"/>
+      <line num="1" count="1" type="stmt"/>
+      <line num="2" count="7" type="stmt"/>
+      <line num="3" count="7" type="stmt"/>
+      <line num="4" count="7" type="stmt"/>
+      <line num="6" count="7" type="cond" truecount="4" falsecount="0"/>
+      <line num="7" count="2" type="stmt"/>
+      <line num="9" count="5" type="cond" truecount="2" falsecount="0"/>
+      <line num="10" count="1" type="stmt"/>
+      <line num="13" count="4" type="cond" truecount="2" falsecount="0"/>
+      <line num="14" count="2" type="cond" truecount="2" falsecount="0"/>
+      <line num="15" count="1" type="stmt"/>
+      <line num="17" count="1" type="stmt"/>
+      <line num="20" count="2" type="cond" truecount="4" falsecount="0"/>
+      <line num="21" count="1" type="stmt"/>
+      <line num="24" count="1" type="stmt"/>
     </file>
   </project>
 </coverage>
