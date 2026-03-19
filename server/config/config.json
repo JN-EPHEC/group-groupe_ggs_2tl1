@@ -1,9 +1,9 @@
 {
   "development": {
-    "username": "postgres",
+    "username": "postgres.sxwfdvcvqvzsvmcinhiz",
     "password": "hirhyd-qogwEx-1kehdi",
     "database": "postgres",
-    "host": "db.sxwfdvcvqvzsvmcinhiz.supabase.co",
+    "host": "aws-1-eu-west-1.pooler.supabase.com",
     "port": 5432,
     "dialect": "postgres",
     "dialectOptions": {
@@ -14,17 +14,31 @@
     }
   },
 "test": {
-  "username": "root",
-  "password": null,
-  "database": "database_test",
-  "host": "127.0.0.1",
-  "dialect": "mysql"
-},
+    "username": "postgres.sxwfdvcvqvzsvmcinhiz",
+    "password": "hirhyd-qogwEx-1kehdi",
+    "database": "postgres",
+    "host": "aws-1-eu-west-1.pooler.supabase.com",
+    "port": 5432,
+    "dialect": "postgres",
+    "dialectOptions": {
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false
+      }
+    }
+  },
 "production": {
-  "username": "root",
-  "password": null,
-  "database": "database_production",
-  "host": "127.0.0.1",
-  "dialect": "mysql"
-}
+    "username": "postgres.sxwfdvcvqvzsvmcinhiz",
+    "password": "hirhyd-qogwEx-1kehdi",
+    "database": "postgres",
+    "host": "aws-1-eu-west-1.pooler.supabase.com",
+    "port": 5432,
+    "dialect": "postgres",
+    "dialectOptions": {
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false
+      }
+    }
+  }
 }
