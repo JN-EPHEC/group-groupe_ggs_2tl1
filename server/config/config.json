@@ -1,9 +1,6 @@
 {
   "development": {
-    "username": "postgres.sxwfdvcvqvzsvmcinhiz",
-    "password": "hirhyd-qogwEx-1kehdi",
-    "database": "postgres",
-    "host": "aws-1-eu-west-1.pooler.supabase.com",
+    "use_env_variable": "DATABASE_URL",
     "port": 5432,
     "dialect": "postgres",
     "dialectOptions": {
@@ -14,10 +11,7 @@
     }
   },
 "test": {
-    "username": "postgres.sxwfdvcvqvzsvmcinhiz",
-    "password": "hirhyd-qogwEx-1kehdi",
-    "database": "postgres",
-    "host": "aws-1-eu-west-1.pooler.supabase.com",
+    "use_env_variable": "DATABASE_URL",
     "port": 5432,
     "dialect": "postgres",
     "dialectOptions": {
@@ -28,10 +22,7 @@
     }
   },
 "production": {
-    "username": "postgres.sxwfdvcvqvzsvmcinhiz",
-    "password": "hirhyd-qogwEx-1kehdi",
-    "database": "postgres",
-    "host": "aws-1-eu-west-1.pooler.supabase.com",
+    "use_env_variable": "DATABASE_URL",
     "port": 5432,
     "dialect": "postgres",
     "dialectOptions": {

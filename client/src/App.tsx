@@ -14,7 +14,7 @@ function App() {
   const [data, setData] = useState<User[]>([]);
   // 2. Appel API au montage du composant
   useEffect(() => {
-    fetch("http://localhost:3000/api/users")
+    fetch(`${import.meta.env.VITE_API_URL}/users`)
       .then(res => res.json())
       .then(result => setData(result))
       .catch(err => console.error(err));
