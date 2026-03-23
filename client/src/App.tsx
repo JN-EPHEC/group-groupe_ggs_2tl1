@@ -26,6 +26,7 @@ function App() {
           <li key={item.id}>{item.name}</li>
         ))}
         <h2>Total: {data.length}</h2>
+        <p>LE TEST ULTIME POUR CD ACTION AAAHHHHH</p>
       </ul>
     </div>
   );
