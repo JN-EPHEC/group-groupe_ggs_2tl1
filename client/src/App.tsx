@@ -1,5 +1,3 @@
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 
 import { useEffect, useState } from "react";
@@ -27,6 +25,7 @@ function App() {
         {data.map((item) => (
           <li key={item.id}>{item.name}</li>
         ))}
+        <h2>Total: {data.length}</h2>
       </ul>
     </div>
   );
