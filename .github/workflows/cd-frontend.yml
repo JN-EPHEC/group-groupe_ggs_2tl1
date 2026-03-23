@@ -29,3 +29,5 @@ jobs:
           source: "client/dist/*"
           target: "/var/www/html/"
           strip_components: 2
+          overwrite: true
+          rm: true
