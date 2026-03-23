@@ -28,7 +28,7 @@ function App() {
           <li key={item.id}>{item.firstName} {item.lastName}</li>
         ))}
         <h2>Total: {data.length}</h2>
-        <p>LE CD FONCTIONNE OOUUUUUU AHHHHH</p>
+        <p>LE CD FONCTIONNE OOUUUUUU AHHHHH frrrr</p>
       </ul>
     </div>
   );
