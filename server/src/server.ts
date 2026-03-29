@@ -2,6 +2,7 @@ import express from 'express';
 import type { Request, Response } from 'express';
 import userRoutes from './routes/userRoutes.js';
 import rootRoutes from './routes/rootRoutes.js';
+import adminRoutes from './routes/adminRoutes.js'
 import sequelize from './config/database.js';
 import { requestLogger } from './middlewares/loggers.js';
 import { errorHandler } from "./middlewares/errorHandlers.js";
@@ -37,6 +38,8 @@ app.use(express.json());
 app.use(requestLogger)
 
 app.use('/api/users', userRoutes);
+
+app.use('/api/admin',adminRoutes)
 
 //app.use('/', rootRoutes);
 
