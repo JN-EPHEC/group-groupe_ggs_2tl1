@@ -2,12 +2,10 @@ import express from 'express';
 import * as userControllers from '../controllers/userControllers.js'
 import checkIdParam from '../middlewares/checkIdParam.js';
 import checkUser from '../middlewares/checkUser.js';
-import basicAuth from '../middlewares/basicAuth.js'
 
 
 const router = express.Router();
 
-router.use('/',basicAuth);
 router.use('/:id', checkIdParam,checkUser);
 
 /**
