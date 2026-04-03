@@ -1,12 +1,12 @@
 import express from 'express';
 import * as userControllers from '../controllers/userControllers.js'
 import checkIdParam from '../middlewares/checkIdParam.js';
-
+import checkUser from '../middlewares/checkUser.js';
 
 
 const router = express.Router();
 
-router.use('/:id', checkIdParam);
+router.use('/:id', checkIdParam,checkUser);
 
 /**
  * @swagger
@@ -20,7 +20,7 @@ router.use('/:id', checkIdParam);
  *       500:
  *         description: Erreur serveur
  */
-router.get('/', userControllers.getAllUsers);
+router.get('/',userControllers.getAllUsers);
 
 /**
  * @swagger
@@ -104,7 +104,7 @@ router.post('/', userControllers.createUser);
  *       500:
  *         description: Erreur serveur
  */
-router.put('/:id', userControllers.updateUser);
+router.put('/:id',userControllers.updateUser);
 
 /**
  * @swagger
