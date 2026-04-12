@@ -1,9 +1,7 @@
 import express from 'express';
-import type { Request, Response } from 'express';
 import userRoutes from './routes/userRoutes.js';
-import rootRoutes from './routes/rootRoutes.js';
 import jwtRoutes from './routes/jwtRoutes.js'
-import sequelize from './config/database.js';
+import prisma from './config/prisma.js';
 import { requestLogger } from './middlewares/loggers.js';
 import { errorHandler } from "./middlewares/errorHandlers.js";
 import swaggerUi from "swagger-ui-express";
@@ -13,12 +11,11 @@ import cors from 'cors';
 
 
 const app = express();
-const port = 3000;
+const port = Number(process.env.PORT ?? 3000);
 
 async function startServer() {
   try {
-    await sequelize.authenticate();
-    await sequelize.sync();
+    await prisma.$connect();
     console.log("Database connected.");
 
     app.listen(port, () => {

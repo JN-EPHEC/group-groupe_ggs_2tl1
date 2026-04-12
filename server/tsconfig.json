@@ -7,11 +7,11 @@
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
-    "target": "esnext",
+    "target": "ES2023",
     "types": ["node", "jest"],
-    "module": "esnext",
+    "module": "ESNext",
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],
@@ -25,6 +25,7 @@
     // Stricter Typechecking Options
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
+    "esModuleInterop": true,
 
     // Style Options
     // "noImplicitReturns": true,
