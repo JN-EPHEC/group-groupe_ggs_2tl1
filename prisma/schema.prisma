@@ -7,18 +7,42 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  firstName String   @db.VarChar(255)
-  lastName  String?  @db.VarChar(255)
-  createdAt DateTime @db.Timestamptz(6)
-  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+model Categorie {
+  id_categorie  Int @id @default(autoincrement())
+  nom String @unique
+  description String?
 
-  @@map("Users")
+  produits Produit[]
 }
 
-model SequelizeMeta {
-  name String @id @db.VarChar(255)
+model Produit {
+  id_produit  Int @id @default(autoincrement())
+  nom String
+  prix Decimal(10)
+  description String?
+  stock Int @default(0)
+  image_url String
 
-  @@ignore
+  categories Categorie[]
+}
+
+model Commande {
+  id_commande Int @id @default(autoincrement())
+  etat_commande DateTime  @default(now())
+  prix  Decimal(10)
+  adresse_livraison String
+
+  statut Statut @relation(fields: [id_statut], references: [id_statut])
+  id_statut Int
+
+  id_client Int
+  client Client @relation(fields: [id_client]), references: 
+}
+
+
+model Statut {
+  id_statut Int @id @default(autoincrement())
+  valeur String 
+
+  commandes Commande[]
 }
