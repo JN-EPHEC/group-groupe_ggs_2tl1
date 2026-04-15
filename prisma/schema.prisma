@@ -1,2 +1,142 @@
+generator client {
+  provider = "prisma-client-js"
+}
 
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
+// Table des utilisateurs
+model User {
+  id        Int      @id @default(autoincrement())
+  firstName String
+  lastName  String
+  email     String   @unique
+  createdAt DateTime @default(now())
+
+  // Mots de passe
+  credentials Credential?
+
+  // Roles
+  roles UserRole[]
+
+  // Commandes
+  orders Order[]
+
+  // Addresses
+  addresses Address[]
+}
+
+// Tables qui contient les mots de passe hashé des utilisateurs
+model Credential {
+  id           Int    @id @default(autoincrement())
+  passwordHash String
+  salt         String
+
+  // Utilisateur 
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+}
+
+// Tables des rôles par utilisateur
+model UserRole {
+  // Utilisateur
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  // Role
+  roleId Int
+  role   Role @relation(fields: [roleId], references: [id])
+
+  @@id([userId, roleId])
+}
+
+// Table des rôles
+model Role {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  // Utilisateur
+  users UserRole[]
+}
+
+// Table des addresses
+model Address {
+  id         Int    @id @default(autoincrement())
+  street     String
+  city       String
+  state      String
+  postalCode String
+  country    String
+
+  // Utilisateur
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+}
+
+// Table des commandes
+model Order {
+  id        Int      @id @default(autoincrement())
+  orderDate DateTime @default(now())
+
+  // Status de la commande
+  statusId Int
+  status   OrderStatus @relation(fields: [statusId], references: [id])
+
+  // Utilisateurs
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  // Produits
+  products OrderProduct[]
+}
+
+// Table des status de commandes
+model OrderStatus {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  // Produits de la commande
+  orders Order[]
+}
+
+// Tables des produits de la commande
+model OrderProduct {
+  id              Int     @id @default(autoincrement())
+  quantity        Int
+  priceAtPurchase Decimal
+
+  // Commande
+  orderId Int
+  order   Order @relation(fields: [orderId], references: [id])
+
+  // Produits
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+// Tables des produits
+model Product {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String
+  price       Decimal
+  stock       Int
+
+  // Commande
+  orders OrderProduct[]
+
+  // Categories
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id])
+}
+
+// Tables des catégories
+model Category {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  //  Produits
+  products Product[]
+}
