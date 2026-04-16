@@ -26,9 +26,25 @@ async function startServer() {
     console.error("Unable to connect to the database:", error);
   };
 }
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.use(cors()); // Autorise tout le monde (acceptable uniquement en dev)
+// Swagger - dev only
+if (process.env.NODE_ENV !== "production") {
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+}
+
+// CORS configuration
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+  credentials: true,
+};
+
+if (process.env.NODE_ENV !== "production") {
+  // En développement : CORS permissif
+  app.use(cors());
+} else {
+  // En production : CORS restreint
+  app.use(cors(corsOptions));
+}
 
 app.use(express.json());
 

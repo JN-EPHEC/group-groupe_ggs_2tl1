@@ -4,10 +4,11 @@ import prisma from "../config/prisma.js"
 type UserPayload = {
         firstName?: unknown;
         lastName?: unknown;
+        email?: unknown;
 };
 
 const buildUpdateData = (payload: UserPayload) => {
-        const data: { firstName?: string; lastName?: string | null } = {};
+        const data: { firstName?: string; lastName?: string | null; email?: string } = {};
 
         if (typeof payload.firstName === 'string') {
                 data.firstName = payload.firstName;
@@ -15,6 +16,10 @@ const buildUpdateData = (payload: UserPayload) => {
 
         if (typeof payload.lastName === 'string' || payload.lastName === null) {
                 data.lastName = payload.lastName;
+        }
+
+        if (typeof payload.email === 'string') {
+                data.email = payload.email;
         }
 
         return data;
@@ -42,9 +47,8 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
         const user = await prisma.user.create({
                 data: {
                         firstName: payload.firstName as string,
-                        ...(payload.lastName !== undefined
-                                ? { lastName: payload.lastName as string | null }
-                                : {}),
+                        lastName: payload.lastName as string,
+                        email: payload.email as string,
                 }
         });
 

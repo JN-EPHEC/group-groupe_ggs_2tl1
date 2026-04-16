@@ -1,0 +1,49 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  VITE_API_URL: ${{ vars.VITE_API_URL || 'https://api.yourdomain.com/api' }}
+  NODE_ENV: production
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm run setup
+      
+      - name: Build client
+        working-directory: ./client
+        env:
+          VITE_API_URL: ${{ env.VITE_API_URL }}
+        run: npm run build
+      
+      - name: Build server
+        working-directory: ./server
+        run: npm run build
+      
+      - name: Run tests
+        working-directory: ./server
+        run: npm run test
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            server/dist
+            client/dist

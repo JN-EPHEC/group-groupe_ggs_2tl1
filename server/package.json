@@ -10,12 +10,15 @@
   "allowSyntheticDefaultImports": true,
   "scripts": {
     "start": "tsx watch src/server.ts",
+    "start:prod": "node dist/server.js",
+    "build": "tsc",
+    "dev": "tsx watch src/server.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "prisma:generate": "dotenv -e .env -- prisma generate --schema ../prisma/schema.prisma",
-    "prisma:migrate": "dotenv -e .env -- prisma migrate dev --schema ../prisma/schema.prisma",
-    "prisma:deploy": "dotenv -e .env -- prisma migrate deploy --schema ../prisma/schema.prisma"
+    "prisma:generate": "dotenv -e ../.env -- prisma generate --schema ../prisma/schema.prisma",
+    "prisma:migrate": "dotenv -e ../.env -- prisma migrate dev --schema ../prisma/schema.prisma",
+    "prisma:deploy": "dotenv -e ../.env -- prisma migrate deploy --schema ../prisma/schema.prisma"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
