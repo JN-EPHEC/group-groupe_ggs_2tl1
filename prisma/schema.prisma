@@ -7,136 +7,110 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Table des utilisateurs
 model User {
-  id        Int      @id @default(autoincrement())
-  firstName String
-  lastName  String
-  email     String   @unique
-  createdAt DateTime @default(now())
+  id          Int           @id @default(autoincrement())
+  username    String
+  email       String        @unique
+  created_at  DateTime      @default(now())
 
-  // Mots de passe
-  credentials Credential?
-
-  // Roles
-  roles UserRole[]
-
-  // Commandes
-  orders Order[]
-
-  // Addresses
-  addresses Address[]
+  credentials Credentials?
+  addresses   Address[]
+  orders      Orders[]
+  roles       UserRole[]
 }
 
-// Tables qui contient les mots de passe hashé des utilisateurs
-model Credential {
-  id           Int    @id @default(autoincrement())
-  passwordHash String
-  salt         String
+model Credentials {
+  id            Int    @id @default(autoincrement())
+  user_id       Int    @unique
+  password_hash String
+  salt          String
 
-  // Utilisateur 
-  userId Int  @unique
-  user   User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [user_id], references: [id])
 }
 
-// Tables des rôles par utilisateur
-model UserRole {
-  // Utilisateur
-  userId Int
-  user   User @relation(fields: [userId], references: [id])
-
-  // Role
-  roleId Int
-  role   Role @relation(fields: [roleId], references: [id])
-
-  @@id([userId, roleId])
-}
-
-// Table des rôles
-model Role {
-  id   Int    @id @default(autoincrement())
-  name String
-
-  // Utilisateur
-  users UserRole[]
-}
-
-// Table des addresses
 model Address {
   id         Int    @id @default(autoincrement())
+  user_id    Int
   street     String
   city       String
   state      String
   postalCode String
   country    String
 
-  // Utilisateur
-  userId Int
-  user   User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [user_id], references: [id])
 }
 
-// Table des commandes
-model Order {
-  id        Int      @id @default(autoincrement())
-  orderDate DateTime @default(now())
+model Orders {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  orderDate  DateTime
+  status     String
 
-  // Status de la commande
-  statusId Int
-  status   OrderStatus @relation(fields: [statusId], references: [id])
-
-  // Utilisateurs
-  userId Int
-  user   User @relation(fields: [userId], references: [id])
-
-  // Produits
-  products OrderProduct[]
+  user          User           @relation(fields: [user_id], references: [id])
+  orderProducts OrderProduct[]
 }
 
-// Table des status de commandes
-model OrderStatus {
-  id   Int    @id @default(autoincrement())
-  name String
-
-  // Produits de la commande
-  orders Order[]
-}
-
-// Tables des produits de la commande
 model OrderProduct {
-  id              Int     @id @default(autoincrement())
+  id              Int   @id @default(autoincrement())
+  order_id        Int
+  product_id      Int
   quantity        Int
-  priceAtPurchase Decimal
+  priceAtPurchase Float
 
-  // Commande
-  orderId Int
-  order   Order @relation(fields: [orderId], references: [id])
-
-  // Produits
-  productId Int
-  product   Product @relation(fields: [productId], references: [id])
+  order   Orders  @relation(fields: [order_id], references: [id])
+  product Products @relation(fields: [product_id], references: [id])
 }
 
-// Tables des produits
-model Product {
-  id          Int     @id @default(autoincrement())
+model Products {
+  id          Int      @id @default(autoincrement())
   name        String
   description String
-  price       Decimal
+  price       Float
   stock       Int
+  category_id Int
 
-  // Commande
-  orders OrderProduct[]
-
-  // Categories
-  categoryId Int
-  category   Category @relation(fields: [categoryId], references: [id])
+  category      Categories     @relation(fields: [category_id], references: [id])
+  orderProducts OrderProduct[]
 }
 
-// Tables des catégories
-model Category {
+model Categories {
   id   Int    @id @default(autoincrement())
   name String
 
-  //  Produits
-  products Product[]
+  products Products[]
+}
+
+model Role {
+  id    Int    @id @default(autoincrement())
+  name  String
+
+  permissions RolePermission[]
+  users       UserRole[]
+}
+
+model Permissions {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  roles RolePermission[]
+}
+
+model RolePermission {
+  role_id       Int
+  permission_id Int
+
+  role       Role        @relation(fields: [role_id], references: [id])
+  permission Permissions @relation(fields: [permission_id], references: [id])
+
+  @@id([role_id, permission_id])
+}
+
+model UserRole {
+  user_id Int
+  role_id Int
+
+  user User @relation(fields: [user_id], references: [id])
+  role Role @relation(fields: [role_id], references: [id])
+
+  @@id([user_id, role_id])
 }
