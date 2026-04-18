@@ -7,42 +7,148 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Categorie {
-  id_categorie  Int @id @default(autoincrement())
-  nom String @unique
-  description String?
+// ============================================
+// TABLE UTILISATEUR
+// ============================================
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String
+  email     String   @unique
+  createdAt DateTime @default(now())
 
-  produits Produit[]
+  // Relations 1,1
+  credentials Credential?
+
+  // Relations 1,n
+  addresses Address[]
+  orders    Order[]
+  roles     UserRole[]
 }
 
-model Produit {
-  id_produit  Int @id @default(autoincrement())
-  nom String
-  prix Decimal(10)
-  description String?
-  stock Int @default(0)
-  image_url String
+// ============================================
+// CREDENTIALS (Possède) - 1,1 avec User
+// ============================================
+model Credential {
+  id           Int    @id @default(autoincrement())
+  passwordHash String @db.VarChar(128)
+  salt         String @db.VarChar(256)
 
-  categories Categorie[]
+  // Clé étrangère unique vers User (1,1)
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Commande {
-  id_commande Int @id @default(autoincrement())
-  etat_commande DateTime  @default(now())
-  prix  Decimal(10)
-  adresse_livraison String
+// ============================================
+// ADDRESS (Possède) - 1,n avec User
+// ============================================
+model Address {
+  id         Int    @id @default(autoincrement())
+  street     String @db.VarChar(255)
+  city       String @db.VarChar(128)
+  state      String @db.VarChar(128)
+  postalCode String @db.VarChar(25)
+  country    String @db.VarChar(25)
 
-  statut Statut @relation(fields: [id_statut], references: [id_statut])
-  id_statut Int
-
-  id_client Int
-  client Client @relation(fields: [id_client]), references: 
+  // Clé étrangère vers User
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+// ============================================
+// ORDER (Effectue) - n,1 avec User, Contient OrderProduct
+// ============================================
+model Order {
+  id        Int      @id @default(autoincrement())
+  orderDate DateTime @default(now())
+  status    String   @default("pending")
 
-model Statut {
-  id_statut Int @id @default(autoincrement())
-  valeur String 
+  // Clé étrangère vers User
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  commandes Commande[]
+  // Relations n
+  products OrderProduct[]
+}
+
+// ============================================
+// ORDER_PRODUCT (Contient, Compose) - n,n entre Order et Product
+// ============================================
+model OrderProduct {
+  id              Int     @id @default(autoincrement())
+  quantity        Int
+  priceAtPurchase Decimal
+
+  // Clés étrangères
+  orderId   Int
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+// ============================================
+// PRODUCT (Compose) - n,1 avec Category
+// ============================================
+model Product {
+  id          Int     @id @default(autoincrement())
+  name        String  @db.VarChar(255)
+  description String
+  price       Decimal
+  stock       Int
+
+  // Clé étrangère vers Category
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  // Relations n
+  orders OrderProduct[]
+}
+
+// ============================================
+// CATEGORY (Appartient) - 1,n avec Product
+// ============================================
+model Category {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  // Relations n
+  products Product[]
+}
+
+// ============================================
+// ROLE (Possède) - n,n avec User via UserRole, n,1 avec Permission
+// ============================================
+model Role {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  // Relations
+  permissions Permission[]
+  users       UserRole[]
+}
+
+// ============================================
+// PERMISSION (Possédé par) - n,1 avec Role
+// ============================================
+model Permission {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  // Clé étrangère vers Role
+  roleId Int
+  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+}
+
+// ============================================
+// USER_ROLE (Possède) - n,n join table entre User et Role
+// ============================================
+model UserRole {
+  // Clés étrangères
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  roleId Int
+  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  // Clé primaire composite
+  @@id([userId, roleId])
 }
