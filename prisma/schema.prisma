@@ -7,148 +7,110 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ============================================
-// TABLE UTILISATEUR
-// ============================================
 model User {
-  id        Int      @id @default(autoincrement())
-  username  String
-  email     String   @unique
-  createdAt DateTime @default(now())
+  id          Int           @id @default(autoincrement())
+  username    String
+  email       String        @unique
+  created_at  DateTime      @default(now())
 
-  // Relations 1,1
-  credentials Credential?
-
-  // Relations 1,n
-  addresses Address[]
-  orders    Order[]
-  roles     UserRole[]
+  credentials Credentials?
+  addresses   Address[]
+  orders      Orders[]
+  roles       UserRole[]
 }
 
-// ============================================
-// CREDENTIALS (Possède) - 1,1 avec User
-// ============================================
-model Credential {
-  id           Int    @id @default(autoincrement())
-  passwordHash String @db.VarChar(128)
-  salt         String @db.VarChar(256)
+model Credentials {
+  id            Int    @id @default(autoincrement())
+  user_id       Int    @unique
+  password_hash String
+  salt          String
 
-  // Clé étrangère unique vers User (1,1)
-  userId Int  @unique
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [user_id], references: [id])
 }
 
-// ============================================
-// ADDRESS (Possède) - 1,n avec User
-// ============================================
 model Address {
   id         Int    @id @default(autoincrement())
-  street     String @db.VarChar(255)
-  city       String @db.VarChar(128)
-  state      String @db.VarChar(128)
-  postalCode String @db.VarChar(25)
-  country    String @db.VarChar(25)
+  user_id    Int
+  street     String
+  city       String
+  state      String
+  postalCode String
+  country    String
 
-  // Clé étrangère vers User
-  userId Int
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [user_id], references: [id])
 }
 
-// ============================================
-// ORDER (Effectue) - n,1 avec User, Contient OrderProduct
-// ============================================
-model Order {
-  id        Int      @id @default(autoincrement())
-  orderDate DateTime @default(now())
-  status    String   @default("pending")
+model Orders {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  orderDate  DateTime
+  status     String
 
-  // Clé étrangère vers User
-  userId Int
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  // Relations n
-  products OrderProduct[]
+  user          User           @relation(fields: [user_id], references: [id])
+  orderProducts OrderProduct[]
 }
 
-// ============================================
-// ORDER_PRODUCT (Contient, Compose) - n,n entre Order et Product
-// ============================================
 model OrderProduct {
-  id              Int     @id @default(autoincrement())
+  id              Int   @id @default(autoincrement())
+  order_id        Int
+  product_id      Int
   quantity        Int
-  priceAtPurchase Decimal
+  priceAtPurchase Float
 
-  // Clés étrangères
-  orderId   Int
-  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId Int
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  order   Orders  @relation(fields: [order_id], references: [id])
+  product Products @relation(fields: [product_id], references: [id])
 }
 
-// ============================================
-// PRODUCT (Compose) - n,1 avec Category
-// ============================================
-model Product {
-  id          Int     @id @default(autoincrement())
-  name        String  @db.VarChar(255)
+model Products {
+  id          Int      @id @default(autoincrement())
+  name        String
   description String
-  price       Decimal
+  price       Float
   stock       Int
+  category_id Int
 
-  // Clé étrangère vers Category
-  categoryId Int
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-
-  // Relations n
-  orders OrderProduct[]
+  category      Categories     @relation(fields: [category_id], references: [id])
+  orderProducts OrderProduct[]
 }
 
-// ============================================
-// CATEGORY (Appartient) - 1,n avec Product
-// ============================================
-model Category {
+model Categories {
   id   Int    @id @default(autoincrement())
-  name String @unique
+  name String
 
-  // Relations n
-  products Product[]
+  products Products[]
 }
 
-// ============================================
-// ROLE (Possède) - n,n avec User via UserRole, n,1 avec Permission
-// ============================================
 model Role {
-  id   Int    @id @default(autoincrement())
-  name String @unique
+  id    Int    @id @default(autoincrement())
+  name  String
 
-  // Relations
-  permissions Permission[]
+  permissions RolePermission[]
   users       UserRole[]
 }
 
-// ============================================
-// PERMISSION (Possédé par) - n,1 avec Role
-// ============================================
-model Permission {
+model Permissions {
   id   Int    @id @default(autoincrement())
-  name String @unique
+  name String
 
-  // Clé étrangère vers Role
-  roleId Int
-  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  roles RolePermission[]
 }
 
-// ============================================
-// USER_ROLE (Possède) - n,n join table entre User et Role
-// ============================================
+model RolePermission {
+  role_id       Int
+  permission_id Int
+
+  role       Role        @relation(fields: [role_id], references: [id])
+  permission Permissions @relation(fields: [permission_id], references: [id])
+
+  @@id([role_id, permission_id])
+}
+
 model UserRole {
-  // Clés étrangères
-  userId Int
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user_id Int
+  role_id Int
 
-  roleId Int
-  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [user_id], references: [id])
+  role Role @relation(fields: [role_id], references: [id])
 
-  // Clé primaire composite
-  @@id([userId, roleId])
+  @@id([user_id, role_id])
 }

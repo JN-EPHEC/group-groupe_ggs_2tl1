@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import User from "../models/User.js"
+import prisma from "../config/prisma.js"
 
 
 export const checkUser = async (
@@ -8,7 +8,9 @@ export const checkUser = async (
     next: NextFunction
     ) => {
         const id = Number(req.params.id);
-        const user = await User.findByPk(id);
+        const user = await prisma.user.findUnique({
+                where: { id }
+        });
 
         if (!user) {
                 return res.status(404).json({ message: 'Pas de user ayant cet ID' });

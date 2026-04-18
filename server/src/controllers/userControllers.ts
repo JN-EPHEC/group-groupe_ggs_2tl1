@@ -1,9 +1,37 @@
 import type { Request, Response, NextFunction } from 'express'
-import User from "../models/User.js"
+import prisma from "../config/prisma.js"
+
+type UserPayload = {
+        firstName?: unknown;
+        lastName?: unknown;
+        email?: unknown;
+};
+
+const buildUpdateData = (payload: UserPayload) => {
+        const data: { firstName?: string; lastName?: string | null; email?: string } = {};
+
+        if (typeof payload.firstName === 'string') {
+                data.firstName = payload.firstName;
+        }
+
+        if (typeof payload.lastName === 'string' || payload.lastName === null) {
+                data.lastName = payload.lastName;
+        }
+
+        if (typeof payload.email === 'string') {
+                data.email = payload.email;
+        }
+
+        return data;
+};
 
 //Services pour récuperer tous les users de l'api
 export const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
-        const users = await User.findAll();
+        const users = await prisma.user.findMany({
+                orderBy: {
+                        id: 'asc'
+                }
+        });
         return res.status(200).json(users);
 }
 
@@ -15,26 +43,40 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
 
 export const createUser = async (req: Request, res: Response, next: NextFunction) => {
 
-        //déstructuration pour recup que 2 éléments.
-        const { firstName, lastName } = req.body;
-        const user = await User.create({
-                firstName,
-                lastName
+        const payload = req.body as UserPayload;
+        const user = await prisma.user.create({
+                data: {
+                        firstName: payload.firstName as string,
+                        lastName: payload.lastName as string,
+                        email: payload.email as string,
+                }
         });
 
         return res.status(201).json(user);
 }
 
 export const updateUser = async (req: Request, res: Response, next: NextFunction) => {
-        const user = (req as any).user;
+        const user = (req as any).user as { id: number };
+        const payload = req.body as UserPayload;
+        const data = buildUpdateData(payload);
 
-        await user.update(req.body);
-        return res.status(200).json(user);
+        if (Object.keys(data).length === 0) {
+                return res.status(200).json(user);
+        }
+
+        const updatedUser = await prisma.user.update({
+                where: { id: user.id },
+                data
+        });
+
+        return res.status(200).json(updatedUser);
 }
 
 export const deleteUser = async (req: Request, res: Response,next: NextFunction) => {
-        const user = (req as any).user;
+        const user = (req as any).user as { id: number };
 
-        await user.destroy();
+        await prisma.user.delete({
+                where: { id: user.id }
+        });
         res.json({ message : `${user.id} a bien été supprimé`})
 }
