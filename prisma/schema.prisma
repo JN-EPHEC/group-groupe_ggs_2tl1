@@ -44,9 +44,10 @@ model Orders {
   id         Int      @id @default(autoincrement())
   user_id    Int
   orderDate  DateTime
-  status     String
+  status_id  Int
 
-  user          User           @relation(fields: [user_id], references: [id])
+  user   User        @relation(fields: [user_id], references: [id])
+  status OrderStatus @relation(fields: [status_id], references: [id])
   orderProducts OrderProduct[]
 }
 
@@ -57,7 +58,7 @@ model OrderProduct {
   quantity        Int
   priceAtPurchase Float
 
-  order   Orders  @relation(fields: [order_id], references: [id])
+  order Orders @relation(fields: [order_id], references: [id])
   product Products @relation(fields: [product_id], references: [id])
 }
 
@@ -75,14 +76,14 @@ model Products {
 
 model Categories {
   id   Int    @id @default(autoincrement())
-  name String
+  name String @unique
 
   products Products[]
 }
 
 model Role {
   id    Int    @id @default(autoincrement())
-  name  String
+  name  String @unique  
 
   permissions RolePermission[]
   users       UserRole[]
@@ -90,7 +91,7 @@ model Role {
 
 model Permissions {
   id   Int    @id @default(autoincrement())
-  name String
+  name String @unique
 
   roles RolePermission[]
 }
@@ -113,4 +114,11 @@ model UserRole {
   role Role @relation(fields: [role_id], references: [id])
 
   @@id([user_id, role_id])
+}
+
+model OrderStatus {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  orders Orders[]
 }
