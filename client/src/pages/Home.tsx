@@ -101,7 +101,7 @@ function Home(){
         </div>
       </section>
 
-      {/* ── EDITORIAL BANNER ── */}
+   {  /* {/* ── EDITORIAL BANNER ── 
       <section className="bg-black text-white px-10 py-28 text-center">
         <p className="text-[10px] tracking-[4px] uppercase text-gray-600 mb-6">
           Notre engagement
@@ -116,7 +116,7 @@ function Home(){
           Explorer
         </a>
       </section>
-
+*/}
     </main>
   );
 

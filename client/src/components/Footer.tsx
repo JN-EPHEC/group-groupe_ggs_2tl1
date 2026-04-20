@@ -46,12 +46,10 @@ function Footer() {
 
       {/* Bottom bar */}
       <div className="border-t border-gray-800 pt-6 flex justify-between items-center">
-        <p className="text-[11px] text-gray-600 tracking-wide">
+        <p className="text-[11px]  text-gray-600 tracking-wide">
           © {new Date().getFullYear()} Groupe GGS 2TL1. Tous droits réservés.
         </p>
-        <p className="text-[11px] text-gray-600 tracking-wide">
-          BE • FR • EN
-        </p>
+        
       </div>
     </footer>
   );
