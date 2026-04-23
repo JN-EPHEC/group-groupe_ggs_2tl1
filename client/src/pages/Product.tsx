@@ -19,12 +19,11 @@ function Product() {
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    setIsLoading(true);
-    setErrorMessage(null);
-
     getProducts()
       .then((result) => {
         setProducts(result);
+        setCurrentPage(1);
+        setErrorMessage(null);
       })
       .catch((error) => {
         console.error("Erreur lors de la recuperation des produits:", error);
@@ -41,12 +40,6 @@ function Product() {
   const safePage = clampPage(currentPage, totalPages);
   const startIndex = (safePage - 1) * PAGE_SIZE;
   const currentProducts = products.slice(startIndex, startIndex + PAGE_SIZE);
-
-  useEffect(() => {
-    if (safePage !== currentPage) {
-      setCurrentPage(safePage);
-    }
-  }, [currentPage, safePage]);
 
   return (
     <main className="bg-white text-black min-h-[70vh] px-6 md:px-10 py-10">
@@ -99,7 +92,9 @@ function Product() {
               <nav className="mt-10 flex items-center justify-center gap-2 flex-wrap">
                 <button
                   type="button"
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  onClick={() =>
+                    setCurrentPage((p) => clampPage(p - 1, totalPages))
+                  }
                   disabled={safePage === 1}
                   className="px-3 py-2 text-xs tracking-widest uppercase border border-gray-300 bg-white disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-60 transition-opacity"
                 >
@@ -113,7 +108,7 @@ function Product() {
                     <button
                       key={page}
                       type="button"
-                      onClick={() => setCurrentPage(page)}
+                      onClick={() => setCurrentPage(clampPage(page, totalPages))}
                       aria-current={isActive ? "page" : undefined}
                       className={`min-w-10 px-3 py-2 text-xs tracking-widest uppercase border transition-opacity hover:opacity-60 ${
                         isActive
@@ -129,7 +124,7 @@ function Product() {
                 <button
                   type="button"
                   onClick={() =>
-                    setCurrentPage((p) => Math.min(totalPages, p + 1))
+                    setCurrentPage((p) => clampPage(p + 1, totalPages))
                   }
                   disabled={safePage === totalPages}
                   className="px-3 py-2 text-xs tracking-widest uppercase border border-gray-300 bg-white disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-60 transition-opacity"
