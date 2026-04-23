@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getProducts } from "../services/productService";
 import type { Product as ProductModel } from "../types/product";
+import ProductCard from "../components/ProductCard";
 
 function Product() {
   const [products, setProducts] = useState<ProductModel[]>([]);
@@ -39,11 +40,11 @@ function Product() {
         {isLoading && (
           <div className="border border-gray-200 rounded-sm p-6 md:p-8 bg-[#faf9f7]">
             <p className="text-sm text-gray-700 mb-4">Chargement des produits...</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {Array.from({ length: 6 }).map((_, index) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+              {Array.from({ length: 8 }).map((_, index) => (
                 <div
                   key={index}
-                  className="h-28 bg-gray-200 animate-pulse rounded-sm"
+                  className="h-64 bg-gray-200 animate-pulse rounded-sm"
                 />
               ))}
             </div>
@@ -64,16 +65,14 @@ function Product() {
 
         {!isLoading && !errorMessage && products.length > 0 && (
           <div className="border border-gray-200 rounded-sm p-6 md:p-8 bg-[#faf9f7]">
-            <p className="text-sm text-gray-700 mb-4">
+            <p className="text-sm text-gray-700 mb-6">
               Produits charges: {products.length}
             </p>
-            <ul className="space-y-2 text-sm text-gray-700">
-              {products.slice(0, 8).map((product) => (
-                <li key={product.id}>
-                  {product.name} - {product.price} EUR
-                </li>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+              {products.map((product) => (
+                <ProductCard key={product.id} product={product} />
               ))}
-            </ul>
+            </div>
           </div>
         )}
       </section>
