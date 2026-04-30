@@ -1,6 +1,14 @@
 import express from 'express';
 import userRoutes from './routes/userRoutes.js';
-import jwtRoutes from './routes/jwtRoutes.js'
+import authRoutes from './routes/authRoutes.js';
+import adminUserRouters from './routes/adminUserRoutes.js'
+import prodRoutes from './routes/prodRoutes.js';
+import jwtRoutes from './routes/jwtRoutes.js';
+import catRoutes from './routes/catRoutes.js';
+import cartRoutes from './routes/cartRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
+
+
 import prisma from './config/prisma.js';
 import { requestLogger } from './middlewares/loggers.js';
 import { errorHandler } from "./middlewares/errorHandlers.js";
@@ -48,11 +56,27 @@ if (process.env.NODE_ENV !== "production") {
 
 app.use(express.json());
 
+//logger
+
 app.use(requestLogger)
 
-app.use('/api/users', userRoutes);
+//Toutes les routes
 
-app.use('/api/auth/login',jwtRoutes)
+
+app.use('/api/users', userRoutes); //routes vers les fonctionnalités utilisateur
+
+app.use('/api/auth', authRoutes); //routes vers l'authentification utilisateur
+
+app.use('/api/admin',adminUserRouters);//routes vers l'accès administrateurs
+
+app.use('/api/products',prodRoutes);//routes vers les produits
+
+app.use('/api/categories',catRoutes);//Routes vers les catégories
+
+app.use('/api/cart',cartRoutes);//routes vers le panier
+
+app.use('/api/orders',orderRoutes);//routes vers les commandes
+
 
 //app.use('/', rootRoutes);
 
