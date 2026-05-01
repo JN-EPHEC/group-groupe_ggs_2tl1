@@ -1,12 +1,5 @@
 import express from 'express';
 import userRoutes from './routes/userRoutes.js';
-import authRoutes from './routes/authRoutes.js';
-import adminUserRouters from './routes/adminUserRoutes.js'
-import prodRoutes from './routes/prodRoutes.js';
-import jwtRoutes from './routes/jwtRoutes.js';
-import catRoutes from './routes/catRoutes.js';
-import cartRoutes from './routes/cartRoutes.js';
-import orderRoutes from './routes/orderRoutes.js';
 
 
 import prisma from './config/prisma.js';
@@ -60,22 +53,8 @@ app.use(express.json());
 
 app.use(requestLogger)
 
-//Toutes les routes
-
-
-app.use('/api/users', userRoutes); //routes vers les fonctionnalités utilisateur
-
-app.use('/api/auth', authRoutes); //routes vers l'authentification utilisateur
-
-app.use('/api/admin',adminUserRouters);//routes vers l'accès administrateurs
-
-app.use('/api/products',prodRoutes);//routes vers les produits
-
-app.use('/api/categories',catRoutes);//Routes vers les catégories
-
-app.use('/api/cart',cartRoutes);//routes vers le panier
-
-app.use('/api/orders',orderRoutes);//routes vers les commandes
+// Mode test temporaire: on ne monte que les routes users
+app.use('/api/users', userRoutes);
 
 
 //app.use('/', rootRoutes);
