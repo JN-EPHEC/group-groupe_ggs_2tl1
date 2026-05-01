@@ -1,21 +1,23 @@
 import express from 'express';
+import checkIdParam from '../middlewares/checkIdParam';
+import * as cartControllers from '../controllers/cartControllers'
 
 const router = express.Router();
 
 //Permet de récupérer le panier actuel du client
-router.get('/',getCart);
+router.get('/',cartControllers.getCart);
 
 //Permet d'ajouter des articles à son panier
-router.post('/items',addItems);
+router.post('/items',cartControllers.addItems);
 
 //Permet de modifier un article de son panier
-router.patch('/items/:id',modifyItem);
+router.patch('/items/:id',checkIdParam,cartControllers.modifyItem);
 
 //Permet de supprimer un articile du panier
-router.delete('/items/:id', deleteItem);
+router.delete('/items/:id',checkIdParam,cartControllers.deleteItem);
 
 //Permet de supprimer tout le panier
-router.delete('/',deleteCart);
+router.delete('/',cartControllers.deleteCart);
 
 
 
