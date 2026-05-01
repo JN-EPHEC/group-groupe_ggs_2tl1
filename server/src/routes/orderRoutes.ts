@@ -1,12 +1,13 @@
 import express from 'express';
-
+import * as orderControllers from '../controllers/orderControllers'
+import checkIdParam from '../middlewares/checkIdParam';
 const router = express.Router();
 
-router.get('/',getOrder);
+router.get('/',orderControllers.getOrder);
 
-router.get('/:id',getOneOrder);
+router.get('/:id',checkIdParam,orderControllers.getOneOrder);
 
-router.post('/',createOrder);
+router.post('/',orderControllers.createOrder);
 
 
 export default router;
