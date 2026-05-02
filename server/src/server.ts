@@ -1,5 +1,6 @@
 import express from 'express';
 import userRoutes from './routes/userRoutes.js';
+import addressRoutes from './routes/addressRoutes.js';
 
 
 import prisma from './config/prisma.js';
@@ -55,6 +56,7 @@ app.use(requestLogger)
 
 // Mode test temporaire: on ne monte que les routes users
 app.use('/api/users', userRoutes);
+app.use('/api/users', addressRoutes);
 
 
 //app.use('/', rootRoutes);

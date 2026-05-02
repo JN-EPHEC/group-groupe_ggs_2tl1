@@ -1,6 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
 import prisma from "../config/prisma.js";
-import { stringify } from "node:querystring";
 
 //Permet de récupérer les informations de l'utilisateur
 export const getProfile = async (req: Request, res: Response, next: NextFunction) => {
@@ -48,7 +47,7 @@ export const getProfile = async (req: Request, res: Response, next: NextFunction
 };
 
 
-//Permet de Aucune données présente les informations de l'utilisateur
+//Permet de récupéerer les informations de l'utilisateur
 export const modifyClient = async (req: Request, res: Response, next: NextFunction) => {
   try {
     //il faudra faire un middleware de check pour éviter de rentrer ici si le userId n'existe pas, lors du refacto.
@@ -123,7 +122,7 @@ export const modifyPassword = async (req: Request, res: Response, next: NextFunc
   }
 }
 
-//Permet de supprimer un compte
+//Permet de déactivé un compte
 export const deleteAccount = async (req: Request, res: Response, next:NextFunction) => {
   try {
     //il faudra faire un middleware de check pour éviter de rentrer ici si le userId n'existe pas, lors du refacto.
@@ -159,4 +158,4 @@ export const deleteAccount = async (req: Request, res: Response, next:NextFuncti
   catch (error) {
     return next(error);
   }
-}
+};

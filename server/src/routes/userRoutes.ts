@@ -24,11 +24,4 @@ router.patch('/me/password',userControllers.modifyPassword);
 //Permet de supprimer son compte
 router.delete('/me',userControllers.deleteAccount);
 
-
-
-
-
-
-//je viens de réaliser qu'il faudra des routes pour toutes les infos du user qui sont des relations. on fera ça près 
-
 export default router;
