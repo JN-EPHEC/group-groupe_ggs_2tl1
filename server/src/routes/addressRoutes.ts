@@ -10,9 +10,16 @@ router.use((req, _res, next) => {
   next();
 });
 
+//Route pour récupérer l'adresse d'un client
 router.get("/me/addresses", addressControllers.getMyAddresses);
+
+//Route pour ajouter une addresse à un client 
 router.post("/me/addresses", addressControllers.createMyAddress);
+
+//Route pour modifier une route d'un client
 router.patch("/me/addresses/:addressId", addressControllers.updateMyAddress);
+
+//Route pour supprimer une route d'un client 
 router.delete("/me/addresses/:addressId", addressControllers.deleteMyAddress);
 
 export default router;

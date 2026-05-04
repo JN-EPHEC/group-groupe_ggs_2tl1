@@ -16,6 +16,7 @@ export const getMyAddresses = async (req: Request, res: Response, next: NextFunc
     });
 
     return res.status(200).json(addresses);
+    
   } catch (error) {
     return next(error);
   }

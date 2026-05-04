@@ -7,7 +7,7 @@ import prisma from '../config/prisma'
 
 export const getAllCat = async ( req:Request,res:Response, next:NextFunction)=> {
     try{
-        const categorie = await prisma.Categories.findMany({})
+        const categorie = await prisma.categories.findMany({})
         return res.status(200).json(categorie)
     }catch(err){next(err)}
 }
@@ -15,7 +15,7 @@ export const getAllCat = async ( req:Request,res:Response, next:NextFunction)=> 
 export const getOneCat = async ( req: Request,res: Response, next: NextFunction) =>{
     try{
         const id = req.params.id;
-        const categorie = await prisma.Categories.findUnique({where:{id:Number(id)}});
+        const categorie = await prisma.categories.findUnique({where:{id:Number(id)}});
         if (!categorie){
             return res.status(404).json({message : `La catégorie portant l'id:${id} n'existe pas`})};
         return res.status(200).json(categorie)
