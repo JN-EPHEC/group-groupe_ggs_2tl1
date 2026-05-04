@@ -2,6 +2,7 @@ import express from 'express';
 import userRoutes from './routes/userRoutes.js';
 import addressRoutes from './routes/addressRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
+import authControllers from './routes/authRoutes.js'
 
 
 import prisma from './config/prisma.js';
@@ -59,6 +60,7 @@ app.use(requestLogger)
 app.use('/api/users', userRoutes);
 app.use('/api/users', addressRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/auth', authControllers)
 
 
 //app.use('/', rootRoutes);
