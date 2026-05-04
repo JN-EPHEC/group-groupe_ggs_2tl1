@@ -1,6 +1,10 @@
 import express from 'express';
 import userRoutes from './routes/userRoutes.js';
-import jwtRoutes from './routes/jwtRoutes.js'
+import addressRoutes from './routes/addressRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
+import authControllers from './routes/authRoutes.js'
+
+
 import prisma from './config/prisma.js';
 import { requestLogger } from './middlewares/loggers.js';
 import { errorHandler } from "./middlewares/errorHandlers.js";
@@ -48,11 +52,16 @@ if (process.env.NODE_ENV !== "production") {
 
 app.use(express.json());
 
+//logger
+
 app.use(requestLogger)
 
+// Mode test temporaire: on ne monte que les routes users
 app.use('/api/users', userRoutes);
+app.use('/api/users', addressRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/auth', authControllers)
 
-app.use('/api/auth/login',jwtRoutes)
 
 //app.use('/', rootRoutes);
 

@@ -13,7 +13,13 @@
     "build": "npm --prefix server run build && npm --prefix client run build",
     "start:prod": "npm --prefix server run start:prod",
     "start:prod:all": "npm run build && npm run start:prod",
-    "test": "jest"
+    "test": "jest",
+    "prisma:generate:dev": "APP_ENV=dev prisma generate",
+    "prisma:generate:prod": "APP_ENV=production prisma generate",
+    "prisma:migrate:dev": "APP_ENV=dev prisma migrate dev",
+    "prisma:migrate:deploy": "APP_ENV=production prisma migrate deploy",
+    "prisma:status:dev": "APP_ENV=dev prisma migrate status",
+    "prisma:status:prod": "APP_ENV=production prisma migrate status"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

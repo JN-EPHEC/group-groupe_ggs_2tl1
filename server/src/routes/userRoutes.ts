@@ -1,133 +1,27 @@
 import express from 'express';
-import * as userControllers from '../controllers/userControllers.js'
+import * as userControllers from '../controllers/userControllers';
 import checkIdParam from '../middlewares/checkIdParam.js';
 import checkUser from '../middlewares/checkUser.js';
 
-
 const router = express.Router();
 
-router.use('/:id', checkIdParam,checkUser);
+// TEMP DEV ONLY: injecte un utilisateur fictif pour tester les routes /me sans auth finale.
+// A retirer dès que le vrai middleware JWT est branché.
+router.use((req, _res, next) => {
+  req.user = { id: 1 };
+  next();
+});
 
-/**
- * @swagger
- * /api/users:
- *   get:
- *     summary: Récupère la liste des utilisateurs
- *     tags: [Users]
- *     responses:
- *       200:
- *         description: Liste des utilisateurs
- *       500:
- *         description: Erreur serveur
- */
-router.get('/',userControllers.getAllUsers);
+//Permet de lire le profil du client
+router.get('/me',userControllers.getProfile);
 
-/**
- * @swagger
- * /api/users/{id}:
- *   get:
- *     summary: Récupère un utilisateur par son ID
- *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Utilisateur trouvé
- *       400:
- *         description: ID invalide
- *       404:
- *         description: Utilisateur introuvable
- *       500:
- *         description: Erreur serveur
- */
-router.get('/:id',userControllers.getUser);
+//Permet de modifier le profil du client
+router.patch('/me',userControllers.modifyClient);
 
-/**
- * @swagger
- * /api/users:
- *   post:
- *     summary: Crée un utilisateur
- *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               firstName:
- *                 type: string
- *               lastName:
- *                 type: string
- *     responses:
- *       201:
- *         description: Utilisateur créé
- *       500:
- *         description: Erreur serveur
- */
-router.post('/', userControllers.createUser);
+//Permet de changer le mot de passe du client
+router.patch('/me/password',userControllers.modifyPassword);
 
-/**
- * @swagger
- * /api/users/{id}:
- *   put:
- *     summary: Met à jour un utilisateur par son ID
- *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               firstName:
- *                 type: string
- *               lastName:
- *                 type: string
- *     responses:
- *       200:
- *         description: Utilisateur mis à jour
- *       400:
- *         description: ID invalide
- *       404:
- *         description: Utilisateur introuvable
- *       500:
- *         description: Erreur serveur
- */
-router.put('/:id',userControllers.updateUser);
-
-/**
- * @swagger
- * /api/users/{id}:
- *   delete:
- *     summary: Supprime un utilisateur par son ID
- *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Utilisateur supprimé
- *       400:
- *         description: ID invalide
- *       404:
- *         description: Utilisateur introuvable
- *       500:
- *         description: Erreur serveur
- */
-router.delete('/:id',userControllers.deleteUser);
+//Permet de supprimer son compte
+router.delete('/me',userControllers.deleteAccount);
 
 export default router;

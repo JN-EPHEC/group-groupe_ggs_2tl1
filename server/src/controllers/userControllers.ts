@@ -1,82 +1,161 @@
-import type { Request, Response, NextFunction } from 'express'
-import prisma from "../config/prisma.js"
+import type { NextFunction, Request, Response } from "express";
+import prisma from "../config/prisma.js";
 
-type UserPayload = {
-        firstName?: unknown;
-        lastName?: unknown;
-        email?: unknown;
+//Permet de récupérer les informations de l'utilisateur
+export const getProfile = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    //il faudra faire un middleware de check pour éviter de rentrer ici si le userId n'existe pas, lors du refacto.
+    const userId = Number((req.user as { id?: number } | undefined)?.id);
+
+    //Permet de vérifier si l'id est valide
+    //il faudra faire un middleware de check pour éviter de rentrer ici si le userId n'existe pas, lors du refacto.
+
+    if (!Number.isInteger(userId) || userId <= 0) {
+      return res.status(401).json({ message: "Utilisateur non authentifie" });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        //il faut remplacer username par firsname et lastname
+        username: true,
+        email: true,
+        created_at: true,
+        addresses: true,
+        roles: {
+          select: {
+            role: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur introuvable" });
+    }
+
+    return res.status(200).json(user);
+  } catch (error) {
+    return next(error);
+  }
 };
 
-const buildUpdateData = (payload: UserPayload) => {
-        const data: { firstName?: string; lastName?: string | null; email?: string } = {};
 
-        if (typeof payload.firstName === 'string') {
-                data.firstName = payload.firstName;
-        }
+//Permet de récupéerer les informations de l'utilisateur
+export const modifyClient = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    //il faudra faire un middleware de check pour éviter de rentrer ici si le userId n'existe pas, lors du refacto.
+    const userId = Number((req.user as { id?: number } | undefined)?.id);
 
-        if (typeof payload.lastName === 'string' || payload.lastName === null) {
-                data.lastName = payload.lastName;
-        }
+    // typage de l'objet data
+    const data: { username?: string; email?: string } = {};
 
-        if (typeof payload.email === 'string') {
-                data.email = payload.email;
-        }
+    //Permet de vérifier si l'id est valide
+    //il faudra faire un middleware de check pour éviter de rentrer ici si le userId n'existe pas, lors du refacto.
 
-        return data;
+    if (!Number.isInteger(userId) || userId <= 0) {
+      return res.status(401).json({ message: "Utilisateur non authentifie" });
+    }
+    // stock dans data le usernale et l'email
+    if (req.body.username !== undefined) data.username = req.body.username;
+
+    if (req.body.email !== undefined) data.email = req.body.email;
+
+    if (Object.keys(data).length === 0) {
+      return res.status(400).json({ message: "Aucune données présente" });
+    }
+
+    //update le client prisma
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data
+    })
+
+    return res.status(200).json(user);
+  }
+  catch (error) {
+    return next(error);
+  }
+}
+
+//Permet de Aucune données présente le mot de passe de l'utilisateur
+export const modifyPassword = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    //il faudra faire un middleware de check pour éviter de rentrer ici si le userId n'existe pas, lors du refacto.
+    const userId = Number((req.user as { id?: number } | undefined)?.id);
+
+    //typage de l'objet data
+    const data: { password_hash?: string } = {};
+
+    //Permet de vérifier si l'id est valide
+    //il faudra faire un middleware de check pour éviter de rentrer ici si le userId n'existe pas, lors du refacto.
+    if (!Number.isInteger(userId) || userId <= 0) {
+      return res.status(401).json({ message: "Utilisateur non authentifie" });
+    }
+    
+    //stock dans data le password
+    if (req.body.password_hash !== undefined) {
+      data.password_hash = req.body.password_hash;
+    }
+
+    //vérifie que l'objet data contienne bien des données
+    if (Object.keys(data).length === 0) {
+      return res.status(400).json({ message: "Aucune données présente" });
+    }
+
+    //update le client prisma
+    const user = await prisma.credentials.update({
+      where: { user_id: userId },
+      data
+    })
+
+    return res.status(200).json(user);
+  }
+  catch (error) {
+    return next(error);
+  }
+}
+
+//Permet de déactivé un compte
+export const deleteAccount = async (req: Request, res: Response, next:NextFunction) => {
+  try {
+    //il faudra faire un middleware de check pour éviter de rentrer ici si le userId n'existe pas, lors du refacto.
+    const userId = Number((req.user as { id?: number } | undefined)?.id);
+
+    //Permet de vérifier si l'id est valide
+    //il faudra faire un middleware de check pour éviter de rentrer ici si le userId n'existe pas, lors du refacto.
+    if (!Number.isInteger(userId) || userId <= 0) {
+      return res.status(401).json({ message: "Utilisateur non authentifie" });
+    }
+
+    //typage de l'objet data
+    const data: { isActive?: boolean} = {};
+
+    //Stock la valeur booleene dans data
+    if (req.body.isActive !== undefined) {
+      data.isActive = req.body.isActive;
+    }
+
+    //vérifie que l'objet data contienne bien des données
+    if (Object.keys(data).length === 0) {
+      return res.status(400).json({ message: "Aucune données présente" });
+    }
+
+    //update le client prisma
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data
+    })
+
+    return res.status(200).json(user);
+  }
+  catch (error) {
+    return next(error);
+  }
 };
-
-//Services pour récuperer tous les users de l'api
-export const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
-        const users = await prisma.user.findMany({
-                orderBy: {
-                        id: 'asc'
-                }
-        });
-        return res.status(200).json(users);
-}
-
-//Services pour récuperer un user précis 
-export const getUser = async (req: Request, res: Response, next: NextFunction) => {
-        const user = (req as any).user;
-        return res.status(200).json(user);
-}
-
-export const createUser = async (req: Request, res: Response, next: NextFunction) => {
-
-        const payload = req.body as UserPayload;
-        const user = await prisma.user.create({
-                data: {
-                        firstName: payload.firstName as string,
-                        lastName: payload.lastName as string,
-                        email: payload.email as string,
-                }
-        });
-
-        return res.status(201).json(user);
-}
-
-export const updateUser = async (req: Request, res: Response, next: NextFunction) => {
-        const user = (req as any).user as { id: number };
-        const payload = req.body as UserPayload;
-        const data = buildUpdateData(payload);
-
-        if (Object.keys(data).length === 0) {
-                return res.status(200).json(user);
-        }
-
-        const updatedUser = await prisma.user.update({
-                where: { id: user.id },
-                data
-        });
-
-        return res.status(200).json(updatedUser);
-}
-
-export const deleteUser = async (req: Request, res: Response,next: NextFunction) => {
-        const user = (req as any).user as { id: number };
-
-        await prisma.user.delete({
-                where: { id: user.id }
-        });
-        res.json({ message : `${user.id} a bien été supprimé`})
-}

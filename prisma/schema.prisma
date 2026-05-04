@@ -12,6 +12,7 @@ model User {
   username    String
   email       String        @unique
   created_at  DateTime      @default(now())
+  isActive    Boolean       @default(true)
 
   credentials Credentials?
   addresses   Address[]
