@@ -140,3 +140,50 @@ export const getAdminUserById = async (req: Request, res: Response, next: NextFu
     return next(error);
   }
 };
+
+export const deleteAdminUserById = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const id = Number(req.params.id);
+    const actorId = Number((req.user as { id?: number } | undefined)?.id);
+
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.status(400).json({ message: 'ID utilisateur invalide.' });
+    }
+
+    if (!Number.isInteger(actorId) || actorId <= 0) {
+      return res.status(401).json({ message: 'Utilisateur authentifie invalide.' });
+    }
+
+    if (id === actorId) {
+      return res.status(403).json({ message: 'Auto-suppression interdite pour un administrateur.' });
+    }
+
+    const existingUser = await prisma.user.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+
+    if (!existingUser) {
+      return res.status(404).json({ message: 'Utilisateur introuvable.' });
+    }
+
+    const anonymizedUser = await prisma.user.update({
+      where: { id },
+      data: {
+        username: `deleted_user_${id}`,
+        email: `deleted_user_${id}@anonymized.local`,
+      },
+    });
+
+    return res.status(200).json({
+      message: 'Utilisateur anonymise avec succes.',
+      utilisateur: {
+        id: anonymizedUser.id,
+        nom: anonymizedUser.username,
+        email: anonymizedUser.email,
+      },
+    });
+  } catch (error) {
+    return next(error);
+  }
+};

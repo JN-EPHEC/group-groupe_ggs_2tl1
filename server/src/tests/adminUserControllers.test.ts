@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
-import { getAdminUserById, getAdminUsers } from '../controllers/adminUserControllers';
+import { deleteAdminUserById, getAdminUserById, getAdminUsers } from '../controllers/adminUserControllers';
 import { prismaMock } from './setup/prisma.singleton';
 
 const createResponse = () => {
@@ -163,6 +163,77 @@ describe('adminUserControllers', () => {
         },
       ],
       avis: [],
+    });
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  it("bloque l'auto-suppression d'un administrateur", async () => {
+    const req = {
+      params: { id: '7' },
+      user: { id: 7, role: 'ADMIN' },
+    } as unknown as Request;
+    const res = createResponse();
+    const next = jest.fn() as NextFunction;
+
+    await deleteAdminUserById(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith({
+      message: 'Auto-suppression interdite pour un administrateur.',
+    });
+    expect(prismaMock.user.findUnique).not.toHaveBeenCalled();
+    expect(prismaMock.user.update).not.toHaveBeenCalled();
+  });
+
+  it('retourne 404 lors de la suppression si utilisateur introuvable', async () => {
+    const req = {
+      params: { id: '9' },
+      user: { id: 1, role: 'ADMIN' },
+    } as unknown as Request;
+    const res = createResponse();
+    const next = jest.fn() as NextFunction;
+
+    prismaMock.user.findUnique.mockResolvedValue(null);
+
+    await deleteAdminUserById(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith({ message: 'Utilisateur introuvable.' });
+    expect(prismaMock.user.update).not.toHaveBeenCalled();
+  });
+
+  it('anonymise correctement un utilisateur sans le supprimer', async () => {
+    const req = {
+      params: { id: '9' },
+      user: { id: 1, role: 'ADMIN' },
+    } as unknown as Request;
+    const res = createResponse();
+    const next = jest.fn() as NextFunction;
+
+    prismaMock.user.findUnique.mockResolvedValue({ id: 9 } as never);
+    prismaMock.user.update.mockResolvedValue({
+      id: 9,
+      username: 'deleted_user_9',
+      email: 'deleted_user_9@anonymized.local',
+    } as never);
+
+    await deleteAdminUserById(req, res, next);
+
+    expect(prismaMock.user.update).toHaveBeenCalledWith({
+      where: { id: 9 },
+      data: {
+        username: 'deleted_user_9',
+        email: 'deleted_user_9@anonymized.local',
+      },
+    });
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({
+      message: 'Utilisateur anonymise avec succes.',
+      utilisateur: {
+        id: 9,
+        nom: 'deleted_user_9',
+        email: 'deleted_user_9@anonymized.local',
+      },
     });
     expect(next).not.toHaveBeenCalled();
   });
