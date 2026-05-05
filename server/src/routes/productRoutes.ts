@@ -18,9 +18,23 @@ const router = express.Router();
  *         name: limit
  *         schema:
  *           type: integer
+ *       - in: query
+ *         name: categorie_id
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: prix_min
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: prix_max
+ *         schema:
+ *           type: number
  *     responses:
  *       200:
  *         description: Liste des produits
+ *       400:
+ *         description: Paramètre de filtre invalide
  *       500:
  *         description: Erreur serveur
  */

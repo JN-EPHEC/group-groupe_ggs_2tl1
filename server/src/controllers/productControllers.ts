@@ -1,4 +1,5 @@
 import type { Request, Response, NextFunction } from 'express';
+import type { Prisma } from '@prisma/client';
 import prisma from '../config/prisma.js';
 
 const DEFAULT_PAGE = 1;
@@ -19,8 +20,42 @@ export const getProducts = async (req: Request, res: Response, next: NextFunctio
     const requestedLimit = parsePositiveInt(req.query.limit, DEFAULT_LIMIT);
     const limit = Math.min(requestedLimit, MAX_LIMIT);
     const skip = (page - 1) * limit;
+    const categoryId = parsePositiveInt(req.query.categorie_id, 0);
+    const minPrice = Number(req.query.prix_min);
+    const maxPrice = Number(req.query.prix_max);
+
+    if (Number.isFinite(minPrice) && minPrice < 0) {
+      return res.status(400).json({ message: 'prix_min doit etre superieur ou egal a 0.' });
+    }
+
+    if (Number.isFinite(maxPrice) && maxPrice < 0) {
+      return res.status(400).json({ message: 'prix_max doit etre superieur ou egal a 0.' });
+    }
+
+    if (Number.isFinite(minPrice) && Number.isFinite(maxPrice) && maxPrice < minPrice) {
+      return res.status(400).json({ message: 'prix_max doit etre superieur ou egal a prix_min.' });
+    }
+
+    const where: Prisma.ProductsWhereInput = {};
+
+    if (categoryId > 0) {
+      where.category_id = categoryId;
+    }
+
+    if (Number.isFinite(minPrice) || Number.isFinite(maxPrice)) {
+      where.price = {};
+
+      if (Number.isFinite(minPrice)) {
+        where.price.gte = minPrice;
+      }
+
+      if (Number.isFinite(maxPrice)) {
+        where.price.lte = maxPrice;
+      }
+    }
 
     const products = await prisma.products.findMany({
+      where,
       skip,
       take: limit,
       orderBy: {
