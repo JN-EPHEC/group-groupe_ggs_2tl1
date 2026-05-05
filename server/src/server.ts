@@ -1,6 +1,7 @@
 import express from 'express';
 import userRoutes from './routes/userRoutes.js';
 import jwtRoutes from './routes/jwtRoutes.js'
+import categoryRoutes from './routes/categoryRoutes.js';
 import prisma from './config/prisma.js';
 import { requestLogger } from './middlewares/loggers.js';
 import { errorHandler } from "./middlewares/errorHandlers.js";
@@ -53,6 +54,8 @@ app.use(requestLogger)
 app.use('/api/users', userRoutes);
 
 app.use('/api/auth/login',jwtRoutes)
+
+app.use('/api/categories', categoryRoutes);
 
 //app.use('/', rootRoutes);
 
