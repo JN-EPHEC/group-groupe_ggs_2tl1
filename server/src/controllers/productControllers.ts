@@ -50,3 +50,40 @@ export const getProducts = async (req: Request, res: Response, next: NextFunctio
     return next(error);
   }
 };
+
+export const getProductById = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.status(400).json({ message: 'ID produit invalide.' });
+    }
+
+    const product = await prisma.products.findUnique({
+      where: { id },
+      include: {
+        category: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!product) {
+      return res.status(404).json({ message: 'Produit introuvable.' });
+    }
+
+    return res.status(200).json({
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      stock: product.stock,
+      category: product.category.name,
+      category_id: product.category_id,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
