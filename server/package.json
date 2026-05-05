@@ -16,7 +16,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "migrate": "dotenv -e .env -- sequelize-cli db:migrate"
+    "migrate": "dotenv -e .env -- sequelize-cli db:migrate",
+     "generate": "prisma generate --schema=../prisma/schema.prisma"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
@@ -47,4 +48,5 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
   }
+  
 }
