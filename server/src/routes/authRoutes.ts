@@ -10,7 +10,7 @@ router.post('/register',authControllers.authRegister);
 router.post('/login',authControllers.authLogin);
 
 //Permet au client de se déconnecter
-router.post('/logout',authLogout);
+router.post('/logout',authControllers.authLogout);
 
 
 export default router;

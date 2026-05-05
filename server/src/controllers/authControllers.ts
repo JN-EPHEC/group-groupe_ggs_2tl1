@@ -128,3 +128,8 @@ export const authLogin = async (req: Request,res: Response,next: NextFunction) =
         return next(error);
     }
 } 
+
+//Permet la déconnexion d'un utilisateur
+export const authLogout = async (req: Request,res: Response,next: NextFunction) => {
+    
+}
