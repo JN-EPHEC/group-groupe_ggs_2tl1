@@ -1,36 +1,13 @@
-import express from 'express'
+import express from 'express';
+import { getAdminUserById, getAdminUsers } from '../controllers/adminUserControllers.js';
+import { verifyAccessToken } from '../middlewares/jwtMiddleware.js';
+import { requireAdminRole } from '../middlewares/requireAdminRole.js';
 
 const router = express.Router();
 
-// Liste tous les users enregistrés
-router.get('/users',getAllUsers);
+router.use(verifyAccessToken, requireAdminRole);
 
-// Renvoie un seul user
-router.get('/users/:id',getUser);
-
-// Modifie un user (role, statut, etc.)
-router.patch('/users/:id',modifyUser);
-
-// Supprime un user
-router.delete('/users/:id',deleteAdmin);
-
-// Crée un user admin
-router.post('/users',createAdmin);
-
-// Ajoute un produit
-router.post('/products',createProduct);
-
-// Modifie partiellement un produit
-router.patch('/products/:id',modifyItemProduct);
-
-// Modifie complètement un produit
-router.put('/products/:id',modifyProduct);
-
-// Supprime un produit
-router.delete('/products/:id',deleteProduct);
-
-// Ajoute une catégorie
-router.post('/categories',createCat);
-
+router.get('/utilisateurs', getAdminUsers);
+router.get('/utilisateurs/:id', getAdminUserById);
 
 export default router;
