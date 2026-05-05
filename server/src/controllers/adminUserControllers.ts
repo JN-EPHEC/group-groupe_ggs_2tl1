@@ -108,6 +108,16 @@ export const getAdminUserById = async (req: Request, res: Response, next: NextFu
             status: true,
           },
         },
+        addresses: {
+          select: {
+            id: true,
+            street: true,
+            city: true,
+            state: true,
+            postalCode: true,
+            country: true,
+          },
+        },
       },
     });
 
@@ -122,6 +132,7 @@ export const getAdminUserById = async (req: Request, res: Response, next: NextFu
       date_inscription: user.created_at,
       roles: user.roles.map((assignment) => assignment.role.name),
       statut: 'actif',
+      adresses: user.addresses,
       commandes: user.orders,
       avis: [],
     });
