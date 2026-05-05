@@ -17,7 +17,10 @@ interface ProductCardProps {
 
 function ProductCard({ product }: ProductCardProps) {
   return (
-    <article className="group border border-gray-200 bg-white rounded-sm overflow-hidden">
+    <a
+      href={`/produits/${product.id}`}
+      className="block group border border-gray-200 bg-white rounded-sm overflow-hidden"
+    >
       <div className="relative aspect-[3/4] bg-[#f2f0ec]">
         {product.image ? (
           <img
@@ -43,7 +46,7 @@ function ProductCard({ product }: ProductCardProps) {
         <p className="text-sm text-gray-500 mb-2">{product.category ?? "Non classé"}</p>
         <p className="text-sm font-medium text-black">{formatPrice(product.price)}</p>
       </div>
-    </article>
+    </a>
   );
 }
 
