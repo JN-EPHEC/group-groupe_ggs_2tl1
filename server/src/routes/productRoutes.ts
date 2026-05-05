@@ -30,11 +30,16 @@ const router = express.Router();
  *         name: prix_max
  *         schema:
  *           type: number
+ *       - in: query
+ *         name: sort
+ *         schema:
+ *           type: string
+ *           enum: [prix_asc, prix_desc, nom_asc, nom_desc]
  *     responses:
  *       200:
  *         description: Liste des produits
  *       400:
- *         description: Paramètre de filtre invalide
+ *         description: Paramètre de filtre ou tri invalide
  *       500:
  *         description: Erreur serveur
  */
