@@ -3,6 +3,7 @@ import userRoutes from './routes/userRoutes.js';
 import addressRoutes from './routes/addressRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import authControllers from './routes/authRoutes.js'
+import verifyAccessToken from './middlewares/jwtMiddleware';
 
 
 import prisma from './config/prisma.js';
@@ -24,6 +25,7 @@ async function startServer() {
 
     app.listen(port, () => {
       console.log(`Server started on http://localhost:${port}.`);
+      console.log(process.env.JWT_SECRET);
     });
   }
   catch (error){
@@ -57,9 +59,9 @@ app.use(express.json());
 app.use(requestLogger)
 
 // Mode test temporaire: on ne monte que les routes users
-app.use('/api/users', userRoutes);
-app.use('/api/users', addressRoutes);
-app.use('/api/orders', orderRoutes);
+app.use('/api/users', verifyAccessToken,userRoutes);
+app.use('/api/adresses', verifyAccessToken,addressRoutes);
+app.use('/api/orders', verifyAccessToken,orderRoutes);
 app.use('/api/auth', authControllers)
 
 

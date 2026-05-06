@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import prisma from "../config/prisma.js";
 import { randomBytes, scryptSync } from "node:crypto";
-
+import jwt from "jsonwebtoken";
 
 type CreateUserInput = {
     username: string;
@@ -81,10 +81,73 @@ export const authRegister = async (req: Request, res: Response, next: NextFuncti
             return user;
         });
 
-        return res.status(201).json(createUser);
+        // Génération du token JWT (auto-login après inscription)
+        const token = jwt.sign(
+            { userId: createUser.id },
+            process.env.JWT_SECRET as string,
+            { expiresIn: "1h" }
+        );
+
+        return res.status(201).json({
+            token,
+            user: {
+                id: createUser.id,
+                username: createUser.username,
+                email: createUser.email
+            }
+        });
     }
 
     catch (error) {
         return next(error);
     }
 }
+
+export const authLogin = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const input = req.body as Partial<CreateUserInput>;
+
+        // Vérification des types
+        if (typeof input.email !== "string" || typeof input.password !== "string") {
+            return res.status(400).json({ message: "Types invalides" });
+        }
+
+        // Cherche l'utilisateur + credentials
+        const user = await prisma.user.findUnique({
+            where: { email: input.email },
+            include: { credentials: true }
+        });
+
+        // Message générique pour sécurité
+        if (!user || !user.credentials) {
+            return res.status(401).json({ message: "Email ou mot de passe incorrect" });
+        }
+
+        // Recalcul du hash avec le salt stocké
+        const hashToCompare = scryptSync(input.password, user.credentials.salt, 64).toString("hex");
+
+        // Comparaison
+        if (hashToCompare !== user.credentials.password_hash) {
+            return res.status(401).json({ message: "Email ou mot de passe incorrect" });
+        }
+
+        // Génération du token JWT
+        const token = jwt.sign(
+            { userId: user.id },
+            process.env.JWT_SECRET as string,
+            { expiresIn: "1h" }
+        );
+
+        return res.status(200).json({
+            token,
+            user: {
+                id: user.id,
+                username: user.username,
+                email: user.email
+            }
+        });
+
+    } catch (error) {
+        return next(error);
+    }
+};
