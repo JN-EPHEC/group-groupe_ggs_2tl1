@@ -9,7 +9,7 @@ declare global {
   }
 }
 
-export const verifyAccessToken = (req: Request, res: Response, next: NextFunction) => {
+const verifyAccessToken = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -17,10 +17,10 @@ export const verifyAccessToken = (req: Request, res: Response, next: NextFunctio
   }
 
   const token = authHeader.substring(7);
-  const accessSecret = process.env.JWT_ACCESS_SECRET;
+  const accessSecret = process.env.JWT_SECRET;
 
   if (!accessSecret) {
-    return res.status(500).json({ message: "JWT_ACCESS_SECRET non configuré" });
+    return res.status(500).json({ message: "JWT_SECRET non configuré" });
   }
 
   try {
@@ -31,3 +31,5 @@ export const verifyAccessToken = (req: Request, res: Response, next: NextFunctio
     res.status(401).json({ message: "Token invalide ou expiré" });
   }
 };
+
+export default verifyAccessToken;

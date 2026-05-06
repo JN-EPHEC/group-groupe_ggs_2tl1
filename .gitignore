@@ -8,3 +8,5 @@ node_modules
 !**/.env.example
 dist/
 **/dist/
+dev.err.log
+dev.out.log

@@ -34,10 +34,10 @@ function Header() {
         {/* Right links */}
         <div className="flex items-center gap-6 flex-1 justify-end">
           <a
-            href="/connexion"
+            href="/login"
             className="text-[11px] tracking-widest uppercase text-black hover:opacity-40 transition-opacity duration-200"
           >
-            Connexion
+            Connection
           </a>
           <a
             href="/panier"

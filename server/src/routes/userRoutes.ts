@@ -5,12 +5,6 @@ import checkUser from '../middlewares/checkUser.js';
 
 const router = express.Router();
 
-// TEMP DEV ONLY: injecte un utilisateur fictif pour tester les routes /me sans auth finale.
-// A retirer dès que le vrai middleware JWT est branché.
-router.use((req, _res, next) => {
-  req.user = { id: 1 };
-  next();
-});
 
 //Permet de lire le profil du client
 router.get('/me',userControllers.getProfile);

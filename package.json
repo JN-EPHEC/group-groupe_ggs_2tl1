@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "setup": "npm install --prefix server && npm install --prefix client",
+    "setup": "npm install --prefix server && npm install --prefix client && prisma generate",
     "dev": "concurrently --kill-others-on-fail --names server,client --prefix-colors blue,magenta \"npm run dev:server\" \"npm run dev:client\"",
     "dev:server": "npm --prefix server run dev",
     "dev:client": "npm --prefix client run dev",
@@ -14,12 +14,12 @@
     "start:prod": "npm --prefix server run start:prod",
     "start:prod:all": "npm run build && npm run start:prod",
     "test": "jest",
-    "prisma:generate:dev": "APP_ENV=dev prisma generate",
-    "prisma:generate:prod": "APP_ENV=production prisma generate",
-    "prisma:migrate:dev": "APP_ENV=dev prisma migrate dev",
-    "prisma:migrate:deploy": "APP_ENV=production prisma migrate deploy",
-    "prisma:status:dev": "APP_ENV=dev prisma migrate status",
-    "prisma:status:prod": "APP_ENV=production prisma migrate status"
+    "prisma:generate:dev": "prisma generate",
+    "prisma:generate:prod": "set APP_ENV=production&& prisma generate",
+    "prisma:migrate:dev": "prisma migrate dev",
+    "prisma:migrate:deploy": "set APP_ENV=production&& prisma migrate deploy",
+    "prisma:status:dev": "prisma migrate status",
+    "prisma:status:prod": "set APP_ENV=production&& prisma migrate status"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
@@ -125,6 +125,7 @@
     "is-promise": "^4.0.0",
     "isexe": "^2.0.0",
     "js-yaml": "^4.1.1",
+    "jsonwebtoken": "^9.0.3",
     "lodash": "^4.17.23",
     "lodash.get": "^4.4.2",
     "lodash.isequal": "^4.5.0",
@@ -241,6 +242,7 @@
   "devDependencies": {
     "@prisma/adapter-pg": "^7.7.0",
     "@types/jest": "^30.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/mocha": "^10.0.10",
     "@types/node": "^25.6.0",
     "@types/pg": "^8.20.0",

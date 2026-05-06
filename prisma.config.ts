@@ -2,7 +2,7 @@ import { config as loadEnv } from "dotenv";
 import { defineConfig } from "prisma/config";
 
 const appEnv = process.env.APP_ENV === "production" ? "production" : "dev";
-const envPath = appEnv === "production" ? ".env.production" : ".env.dev";
+const envPath = appEnv === "production" ? ".env.prod" : ".env.dev";
 
 loadEnv({ path: envPath });
 

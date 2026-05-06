@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import prisma from "../config/prisma.js";
 import { randomBytes, scryptSync } from "node:crypto";
-
+import jwt from "jsonwebtoken";
 
 type CreateUserInput = {
     username: string;
@@ -86,50 +86,24 @@ export const authRegister = async (req: Request, res: Response, next: NextFuncti
             return user;
         });
 
-        return res.status(201).json(createUser);
-    }
+        // Génération du token JWT (auto-login après inscription)
+        const token = jwt.sign(
+            { userId: createUser.id },
+            process.env.JWT_SECRET as string,
+            { expiresIn: "1h" }
+        );
 
-    catch (error) {
-        return next(error);
-    }
-}
-//Permet la connexion d'un utilisateur
-export const authLogin = async (req: Request,res: Response,next: NextFunction) => {
-    try {
-        const input = req.body;
-
-        if (typeof input.email !== "string" || typeof input.password !== "string") {
-            return res.status(400).json({message: "Types incorrect"});
-        }
-
-        const user = await prisma.user.findUnique({
-            where: {email: input.email},
-            include: {
-                credentials: true
+        return res.status(201).json({
+            token,
+            user: {
+                id: createUser.id,
+                username: createUser.username,
+                email: createUser.email
             }
-        })
-        //vérifie si le user existe bien et si le mot de passe est bon
-        if (!user || !user.credentials) {
-            return res.status(401).json({message: "Email ou mot de passe incorrect"});
-        }
-        //hash le paswwaord en input avec le meme salt
-        const hashInput = scryptSync(input.password, user.credentials.salt, 64).toString("hex");
-        //compare les 2 hash
-        if (hashInput !== user.credentials.password_hash) {
-            return res.status(401).json({ message: "Mot de passe incorrect"});
-        }
-        //cas ou la connexion est réussie
-        return res.status(200).json({
-            message: "Connexion réussie",
-            userId: user.id
-        })
+        });
     }
+
     catch (error) {
         return next(error);
     }
-} 
-
-//Permet la déconnexion d'un utilisateur
-export const authLogout = async (req: Request,res: Response,next: NextFunction) => {
-    
 }
