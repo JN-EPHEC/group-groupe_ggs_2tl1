@@ -4,11 +4,7 @@ import prisma from "../config/prisma.js";
 // Permet de récupérer les adresses de l'utilisateur connecté
 export const getMyAddresses = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userId = Number((req.user as { userId?: number } | undefined)?.userId);
-
-    if (!Number.isInteger(userId) || userId <= 0) {
-      return res.status(401).json({ message: "Utilisateur non authentifie" });
-    }
+    const userId = Number(req.user.id);
 
     const addresses = await prisma.address.findMany({
       where: { user_id: userId },
@@ -25,11 +21,7 @@ export const getMyAddresses = async (req: Request, res: Response, next: NextFunc
 // Permet d'ajouter une adresse pour l'utilisateur connecté
 export const createMyAddress = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userId = Number((req.user as { userId?: number } | undefined)?.userId);
-
-    if (!Number.isInteger(userId) || userId <= 0) {
-      return res.status(401).json({ message: "Utilisateur non authentifie" });
-    }
+    const userId = Number(req.user.id);
 
     const { street, city, state, postalCode, country } = req.body;
 
@@ -57,12 +49,8 @@ export const createMyAddress = async (req: Request, res: Response, next: NextFun
 // Permet de modifier une adresse de l'utilisateur connecté
 export const updateMyAddress = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userId = Number((req.user as { userId?: number } | undefined)?.userId);
+    const userId = Number(req.user.id);
     const addressId = Number(req.params.addressId);
-
-    if (!Number.isInteger(userId) || userId <= 0) {
-      return res.status(401).json({ message: "Utilisateur non authentifie" });
-    }
 
     if (!Number.isInteger(addressId) || addressId <= 0) {
       return res.status(400).json({ message: "Id adresse invalide" });
@@ -111,16 +99,8 @@ export const updateMyAddress = async (req: Request, res: Response, next: NextFun
 // Permet de supprimer une adresse de l'utilisateur connecté
 export const deleteMyAddress = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userId = Number((req.user as { userId?: number } | undefined)?.userId);
+    const userId = Number(req.user.id);
     const addressId = Number(req.params.addressId);
-
-    if (!Number.isInteger(userId) || userId <= 0) {
-      return res.status(401).json({ message: "Utilisateur non authentifie" });
-    }
-
-    if (!Number.isInteger(addressId) || addressId <= 0) {
-      return res.status(400).json({ message: "Id adresse invalide" });
-    }
 
     const existingAddress = await prisma.address.findFirst({
       where: {

@@ -4,15 +4,7 @@ import prisma from "../config/prisma.js";
 //Permet de récupérer les informations de l'utilisateur
 export const getProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    //il faudra faire un middleware de check pour éviter de rentrer ici si le userId n'existe pas, lors du refacto.
-    const userId = Number((req.user as { id?: number } | undefined)?.id);
-
-    //Permet de vérifier si l'id est valide
-    //il faudra faire un middleware de check pour éviter de rentrer ici si le userId n'existe pas, lors du refacto.
-
-    if (!Number.isInteger(userId) || userId <= 0) {
-      return res.status(401).json({ message: "Utilisateur non authentifie" });
-    }
+    const userId = Number(req.user.id);
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -50,18 +42,11 @@ export const getProfile = async (req: Request, res: Response, next: NextFunction
 //Permet de récupéerer les informations de l'utilisateur
 export const modifyClient = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    //il faudra faire un middleware de check pour éviter de rentrer ici si le userId n'existe pas, lors du refacto.
-    const userId = Number((req.user as { id?: number } | undefined)?.id);
+    const userId = Number(req.user.id);
 
     // typage de l'objet data
     const data: { username?: string; email?: string } = {};
 
-    //Permet de vérifier si l'id est valide
-    //il faudra faire un middleware de check pour éviter de rentrer ici si le userId n'existe pas, lors du refacto.
-
-    if (!Number.isInteger(userId) || userId <= 0) {
-      return res.status(401).json({ message: "Utilisateur non authentifie" });
-    }
     // stock dans data le usernale et l'email
     if (req.body.username !== undefined) data.username = req.body.username;
 
@@ -87,17 +72,10 @@ export const modifyClient = async (req: Request, res: Response, next: NextFuncti
 //Permet de Aucune données présente le mot de passe de l'utilisateur
 export const modifyPassword = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    //il faudra faire un middleware de check pour éviter de rentrer ici si le userId n'existe pas, lors du refacto.
-    const userId = Number((req.user as { id?: number } | undefined)?.id);
+    const userId = Number(req.user.id);
 
     //typage de l'objet data
     const data: { password_hash?: string } = {};
-
-    //Permet de vérifier si l'id est valide
-    //il faudra faire un middleware de check pour éviter de rentrer ici si le userId n'existe pas, lors du refacto.
-    if (!Number.isInteger(userId) || userId <= 0) {
-      return res.status(401).json({ message: "Utilisateur non authentifie" });
-    }
     
     //stock dans data le password
     if (req.body.password_hash !== undefined) {
@@ -125,14 +103,7 @@ export const modifyPassword = async (req: Request, res: Response, next: NextFunc
 //Permet de déactivé un compte
 export const deleteAccount = async (req: Request, res: Response, next:NextFunction) => {
   try {
-    //il faudra faire un middleware de check pour éviter de rentrer ici si le userId n'existe pas, lors du refacto.
-    const userId = Number((req.user as { id?: number } | undefined)?.id);
-
-    //Permet de vérifier si l'id est valide
-    //il faudra faire un middleware de check pour éviter de rentrer ici si le userId n'existe pas, lors du refacto.
-    if (!Number.isInteger(userId) || userId <= 0) {
-      return res.status(401).json({ message: "Utilisateur non authentifie" });
-    }
+    const userId = Number(req.user.id);
 
     //typage de l'objet data
     const data: { isActive?: boolean} = {};

@@ -16,7 +16,7 @@ type CreateUserInput = {
     }>;
 };
 
-
+//Permet de créer un utilisateur
 export const authRegister = async (req: Request, res: Response, next: NextFunction) => {
     try {
         //récupères les données foournies par le formulaire de création de compte maos partiellement
@@ -150,4 +150,4 @@ export const authLogin = async (req: Request, res: Response, next: NextFunction)
     } catch (error) {
         return next(error);
     }
-};
+};   

@@ -3,7 +3,7 @@ import userRoutes from './routes/userRoutes.js';
 import addressRoutes from './routes/addressRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import authControllers from './routes/authRoutes.js'
-import verifyAccessToken from './middlewares/jwtMiddleware';
+import verifyAuth from './middlewares/requireAuth.js';
 
 
 import prisma from './config/prisma.js';
@@ -59,9 +59,9 @@ app.use(express.json());
 app.use(requestLogger)
 
 // Mode test temporaire: on ne monte que les routes users
-app.use('/api/users', verifyAccessToken,userRoutes);
-app.use('/api/addresses', verifyAccessToken,addressRoutes);
-app.use('/api/orders', verifyAccessToken,orderRoutes);
+app.use('/api/users', verifyAuth,userRoutes);
+app.use('/api/addresses', verifyAuth,addressRoutes);
+app.use('/api/orders', verifyAuth,orderRoutes);
 app.use('/api/auth', authControllers)
 
 

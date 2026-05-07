@@ -9,11 +9,7 @@ type CreateOrderItemInput = {
 // Permet de récupérer toutes les commandes d'un client
 export const getOrder = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userId = Number((req.user as { id?: number } | undefined)?.id);
-
-    if (!Number.isInteger(userId) || userId <= 0) {
-      return res.status(401).json({ message: "Utilisateur non authentifie" });
-    }
+    const userId = Number(req.user.id);
 
     const orders = await prisma.orders.findMany({
       where: { user_id: userId },
@@ -37,12 +33,8 @@ export const getOrder = async (req: Request, res: Response, next: NextFunction) 
 // Permet de récupérer une seule commande d'un client
 export const getOneOrder = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userId = Number((req.user as { id?: number } | undefined)?.id);
+    const userId = Number(req.user.id);
     const orderId = Number(req.params.id);
-
-    if (!Number.isInteger(userId) || userId <= 0) {
-      return res.status(401).json({ message: "Utilisateur non authentifie" });
-    }
 
     if (!Number.isInteger(orderId) || orderId <= 0) {
       return res.status(400).json({ message: "Id commande invalide" });
@@ -76,11 +68,7 @@ export const getOneOrder = async (req: Request, res: Response, next: NextFunctio
 // Permet de créer une commande pour un client -- généré avec de l'ia
 export const createOrder = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userId = Number((req.user as { id?: number } | undefined)?.id);
-
-    if (!Number.isInteger(userId) || userId <= 0) {
-      return res.status(401).json({ message: "Utilisateur non authentifie" });
-    }
+    const userId = Number(req.user.id);
 
     //Récupère les données founies par le client - undefined si rien
     const rawItems = req.body?.items;
