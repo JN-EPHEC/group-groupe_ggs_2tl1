@@ -60,7 +60,7 @@ app.use(requestLogger)
 
 // Mode test temporaire: on ne monte que les routes users
 app.use('/api/users', verifyAccessToken,userRoutes);
-app.use('/api/adresses', verifyAccessToken,addressRoutes);
+app.use('/api/addresses', verifyAccessToken,addressRoutes);
 app.use('/api/orders', verifyAccessToken,orderRoutes);
 app.use('/api/auth', authControllers)
 

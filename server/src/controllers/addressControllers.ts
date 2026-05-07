@@ -4,7 +4,7 @@ import prisma from "../config/prisma.js";
 // Permet de récupérer les adresses de l'utilisateur connecté
 export const getMyAddresses = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userId = Number((req.user as { id?: number } | undefined)?.id);
+    const userId = Number((req.user as { userId?: number } | undefined)?.userId);
 
     if (!Number.isInteger(userId) || userId <= 0) {
       return res.status(401).json({ message: "Utilisateur non authentifie" });
@@ -25,7 +25,7 @@ export const getMyAddresses = async (req: Request, res: Response, next: NextFunc
 // Permet d'ajouter une adresse pour l'utilisateur connecté
 export const createMyAddress = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userId = Number((req.user as { id?: number } | undefined)?.id);
+    const userId = Number((req.user as { userId?: number } | undefined)?.userId);
 
     if (!Number.isInteger(userId) || userId <= 0) {
       return res.status(401).json({ message: "Utilisateur non authentifie" });
@@ -57,7 +57,7 @@ export const createMyAddress = async (req: Request, res: Response, next: NextFun
 // Permet de modifier une adresse de l'utilisateur connecté
 export const updateMyAddress = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userId = Number((req.user as { id?: number } | undefined)?.id);
+    const userId = Number((req.user as { userId?: number } | undefined)?.userId);
     const addressId = Number(req.params.addressId);
 
     if (!Number.isInteger(userId) || userId <= 0) {
@@ -111,7 +111,7 @@ export const updateMyAddress = async (req: Request, res: Response, next: NextFun
 // Permet de supprimer une adresse de l'utilisateur connecté
 export const deleteMyAddress = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userId = Number((req.user as { id?: number } | undefined)?.id);
+    const userId = Number((req.user as { userId?: number } | undefined)?.userId);
     const addressId = Number(req.params.addressId);
 
     if (!Number.isInteger(userId) || userId <= 0) {
