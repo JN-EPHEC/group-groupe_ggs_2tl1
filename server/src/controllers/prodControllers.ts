@@ -10,7 +10,11 @@ import prisma from '../config/prisma.js'
 
 export const getAllProduct = async (req:Request, res:Response, next: NextFunction)=>{
     try {
-        const product = await prisma.Products.findMany({})
+        const product = await prisma.Products.findMany({
+            where: {
+                NOT: { name: { startsWith: 'deleted_product_' } }
+            }
+        })
         return  res.status(200).json(product)
     } catch(err){
         next(err)
@@ -27,7 +31,7 @@ export const getProduct = async (req:Request, res: Response, next: NextFunction)
             where :{ id : Number(id)  }
 
         })
-        if (!product){
+        if (!product || product.name.startsWith('deleted_product_')){
           return  res.status(404).json({message :"le produit n'existe pas ou n'est plus disponible"})
         }
         return res.status(200).json(product)

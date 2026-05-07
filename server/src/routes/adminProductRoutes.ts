@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAdminProducts, updateAdminProduct, updateAdminProductStock } from '../controllers/adminProductControllers.js';
+import { deleteAdminProduct, getAdminProducts, updateAdminProduct, updateAdminProductStock } from '../controllers/adminProductControllers.js';
 import { verifyAccessToken } from '../middlewares/jwtMiddleware.js';
 import { requireAdminRole } from '../middlewares/requireAdminRole.js';
 
@@ -10,5 +10,6 @@ router.use(verifyAccessToken, requireAdminRole);
 router.get('/produits', getAdminProducts);
 router.put('/produits/:id/stock', updateAdminProductStock);
 router.put('/produits/:id', updateAdminProduct);
+router.delete('/produits/:id', deleteAdminProduct);
 
 export default router;

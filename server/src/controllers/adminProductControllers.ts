@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from 'express';
 import prisma from '../config/prisma.js';
 
 type StockLevel = 'rupture' | 'faible' | 'ok';
+const DELETED_PRODUCT_PREFIX = 'deleted_product_';
 
 const getStockLevel = (stock: number): StockLevel => {
   if (stock === 0) return 'rupture';
@@ -220,6 +221,59 @@ export const updateAdminProduct = async (req: Request, res: Response, next: Next
         image_url: imageUrl,
         categorie: updatedProduct.category,
       },
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const deleteAdminProduct = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const productId = parsePositiveInt(req.params.id);
+
+    if (!productId) {
+      return res.status(400).json({ message: 'ID produit invalide.' });
+    }
+
+    const product = await prisma.products.findUnique({
+      where: { id: productId },
+      include: {
+        _count: {
+          select: { orderProducts: true },
+        },
+      },
+    });
+
+    if (!product) {
+      return res.status(404).json({ message: 'Produit introuvable.' });
+    }
+
+    if (product._count.orderProducts > 0) {
+      const softDeletedProduct = await prisma.products.update({
+        where: { id: productId },
+        data: {
+          name: `${DELETED_PRODUCT_PREFIX}${productId}`,
+          description: '[SOFT_DELETED]',
+          stock: 0,
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      });
+
+      return res.status(200).json({
+        message: 'Produit desactive (soft delete) car lie a des commandes.',
+        produit: softDeletedProduct,
+      });
+    }
+
+    await prisma.products.delete({
+      where: { id: productId },
+    });
+
+    return res.status(200).json({
+      message: 'Produit supprime avec succes.',
     });
   } catch (error) {
     return next(error);

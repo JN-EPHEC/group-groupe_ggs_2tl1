@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
-import { getAdminProducts, updateAdminProduct, updateAdminProductStock } from '../controllers/adminProductControllers';
+import { deleteAdminProduct, getAdminProducts, updateAdminProduct, updateAdminProductStock } from '../controllers/adminProductControllers';
 import { prismaMock } from './setup/prisma.singleton';
 
 const createResponse = () => {
@@ -274,5 +274,69 @@ describe('adminProductControllers', () => {
       },
     });
     expect(next).not.toHaveBeenCalled();
+  });
+
+  it('soft delete un produit lie a des commandes', async () => {
+    const req = {
+      params: { id: '5' },
+    } as unknown as Request;
+    const res = createResponse();
+    const next = jest.fn() as NextFunction;
+
+    prismaMock.products.findUnique.mockResolvedValue({
+      id: 5,
+      _count: { orderProducts: 2 },
+    } as never);
+    prismaMock.products.update.mockResolvedValue({
+      id: 5,
+      name: 'deleted_product_5',
+    } as never);
+
+    await deleteAdminProduct(req, res, next);
+
+    expect(prismaMock.products.update).toHaveBeenCalledWith({
+      where: { id: 5 },
+      data: {
+        name: 'deleted_product_5',
+        description: '[SOFT_DELETED]',
+        stock: 0,
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({
+      message: 'Produit desactive (soft delete) car lie a des commandes.',
+      produit: {
+        id: 5,
+        name: 'deleted_product_5',
+      },
+    });
+  });
+
+  it('supprime physiquement un produit sans commande liee', async () => {
+    const req = {
+      params: { id: '6' },
+    } as unknown as Request;
+    const res = createResponse();
+    const next = jest.fn() as NextFunction;
+
+    prismaMock.products.findUnique.mockResolvedValue({
+      id: 6,
+      _count: { orderProducts: 0 },
+    } as never);
+    prismaMock.products.delete.mockResolvedValue({ id: 6 } as never);
+
+    await deleteAdminProduct(req, res, next);
+
+    expect(prismaMock.products.delete).toHaveBeenCalledWith({
+      where: { id: 6 },
+    });
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({
+      message: 'Produit supprime avec succes.',
+    });
   });
 });
