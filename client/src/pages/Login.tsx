@@ -1,26 +1,63 @@
 import { useState } from "react";
+import type { FormEvent } from "react";
+import {useNavigate} from 'react-router-dom'
+
+
+const API_URL = import.meta.env.VITE_API_URL
 
  export default function Login(){
-    const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-   const handleSubmit = async (e) => {
-    e.preventDefault()
-
-    const response = await fetch('/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        user: {          // ← objet JSON imbriqué
+  const [email,    setEmail]   = useState("")
+  const [password, setPassword] = useState("")
+  const [error,    setError]   = useState("")
+  const [succes,  setSuccess] = useState(false)
+  const navigate = useNavigate()
+    // 1. Lors de la connexion
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setSuccess(true);
+    try{
+      const response = await fetch(`${API_URL}/api/auth/login`, {
+        method: "POST",
+        headers : {"Content-Type": "application/json"},
+        body : JSON.stringify({
           email,
-          password,
+          password
+        }),
+        
+        })
+        console.log(email,password)
+        const data = await response.json()
+        if(!response.ok){
+          throw new Error( 'Identifiants incorects')
         }
-      })
-    })
+        localStorage.setItem("token", data.token)  
+        console.log(data.token)   
+      navigate("/")  
 
-    const data = await response.json()
-    
+      } catch (err) {
+      setError(err instanceof Error ? err.message : "Une erreur est survenue.")
+    } finally {
+      setSuccess(false)
+    }
   }
+  // 2. Lors d'un appel protege
+const fetchProfile = async () => {
+const token = localStorage.getItem('token');
+
+const response = await fetch(`${API_URL}/api/users/me`, {
+headers: {
+'Authorization': `Bearer ${token}`
+}
+});
+if (response.status === 401) {
+// Le token a expire ! Il faudrait appeler la route /refresh ici.
+console.log("Token expire, veuillez vous reconnecter.");
+}
+};
+  
     return(
+ 
       <>
       <main className="flex min-h-screen bg-[#f5f3f0]">
         <div className="hidden md:flex w-4/12 bg-[#e8e4df] flex-col justify-end p-14">
@@ -43,7 +80,8 @@ import { useState } from "react";
               </label>
               <input
                 type="email"
-                name="email"
+                value = {email}
+                onChange ={(e)=> setEmail(e.target.value)}
                 placeholder="vous@exemple.com"
                 required
                 className="bg-transparent border-b border-gray-300 focus:border-black outline-none py-2.5 text-sm placeholder:text-gray-300 transition-colors duration-200"
@@ -55,7 +93,8 @@ import { useState } from "react";
               </label>
               <input
                 type="password"
-                name="password"
+                value = {password}
+                onChange = {(e)=> setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
                 className="bg-transparent border-b border-gray-300 focus:border-black outline-none py-2.5 text-sm placeholder:text-gray-300 transition-colors duration-200"
@@ -79,4 +118,7 @@ import { useState } from "react";
       </main>
       </> 
     )
-    }
+  }
+
+
+

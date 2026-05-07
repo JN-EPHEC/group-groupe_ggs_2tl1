@@ -1,4 +1,21 @@
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+
 function Header() {
+  const location = useLocation()
+  const [isConnected, setIsconnected] =useState(false)
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsconnected(Boolean(token));
+
+  }, [location.pathname]);
+  const logout = ( ) =>{
+    localStorage.removeItem("token");
+      setIsconnected(false)
+    
+
+  }
+
   return (
     <header>
       {/* Announcement bar */}
@@ -33,12 +50,22 @@ function Header() {
 
         {/* Right links */}
         <div className="flex items-center gap-6 flex-1 justify-end">
-          <a
-            href="/login"
-            className="text-[11px] tracking-widest uppercase text-black hover:opacity-40 transition-opacity duration-200"
-          >
-            Connection
-          </a>
+          {isConnected ? (
+  <button
+    type="button"
+    onClick={logout}
+    className="text-[11px] tracking-widest uppercase text-black hover:opacity-40 transition-opacity duration-200"
+  >
+    Deconnexion
+  </button>
+) : (
+  <Link
+    to="/login"
+    className="text-[11px] tracking-widest uppercase text-black hover:opacity-40 transition-opacity duration-200"
+  >
+    Connection
+  </Link>
+)}
           <a
             href="/panier"
             className="text-[11px] tracking-widest uppercase text-black hover:opacity-40 transition-opacity duration-200"
