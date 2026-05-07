@@ -8,6 +8,7 @@ import categoryRoutes from './routes/categoryRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import adminUserRoutes from './routes/adminUserRoutes.js';
 import adminProductRoutes from './routes/adminProductRoutes.js';
+import adminOrderRoutes from './routes/adminOrderRoutes.js';
 import prisma from './config/prisma.js';
 import { requestLogger } from './middlewares/loggers.js';
 import { errorHandler } from "./middlewares/errorHandlers.js";
@@ -70,6 +71,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/produits', productRoutes);
 app.use('/api/admin', adminUserRoutes);
 app.use('/api/admin', adminProductRoutes);
+app.use('/api/admin', adminOrderRoutes);
 
 //app.use('/', rootRoutes);
 
