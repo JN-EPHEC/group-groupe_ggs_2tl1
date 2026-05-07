@@ -114,3 +114,114 @@ export const updateAdminProductStock = async (req: Request, res: Response, next:
     return next(error);
   }
 };
+
+const isValidUrl = (value: string) => {
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch (_error) {
+    return false;
+  }
+};
+
+export const updateAdminProduct = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const productId = parsePositiveInt(req.params.id);
+
+    if (!productId) {
+      return res.status(400).json({ message: 'ID produit invalide.' });
+    }
+
+    const nom = typeof req.body?.nom === 'string' ? req.body.nom.trim() : '';
+    const description =
+      req.body?.description === undefined || req.body?.description === null
+        ? ''
+        : String(req.body.description);
+    const prix = Number(req.body?.prix);
+    const quantite = Number(req.body?.quantite);
+    const imageUrl = typeof req.body?.image_url === 'string' ? req.body.image_url.trim() : '';
+    const categorieId = Number(req.body?.categorie_id);
+
+    if (!nom || nom.length > 255) {
+      return res.status(400).json({ message: 'Le nom est requis (max 255 caracteres).' });
+    }
+
+    if (!Number.isFinite(prix) || prix < 0) {
+      return res.status(400).json({ message: 'Le prix doit etre un nombre superieur ou egal a 0.' });
+    }
+
+    if (description.length > 2000) {
+      return res.status(400).json({ message: 'La description ne peut pas depasser 2000 caracteres.' });
+    }
+
+    if (!isValidUrl(imageUrl)) {
+      return res.status(400).json({ message: "L'URL de l'image est invalide." });
+    }
+
+    if (!Number.isInteger(quantite) || quantite < 0) {
+      return res.status(400).json({ message: 'La quantite doit etre un entier superieur ou egal a 0.' });
+    }
+
+    if (!Number.isInteger(categorieId) || categorieId <= 0) {
+      return res.status(400).json({ message: 'ID categorie invalide.' });
+    }
+
+    const [existingProduct, existingCategory] = await Promise.all([
+      prisma.products.findUnique({
+        where: { id: productId },
+        select: { id: true },
+      }),
+      prisma.categories.findUnique({
+        where: { id: categorieId },
+        select: { id: true, name: true },
+      }),
+    ]);
+
+    if (!existingProduct) {
+      return res.status(404).json({ message: 'Produit introuvable.' });
+    }
+
+    if (!existingCategory) {
+      return res.status(404).json({ message: 'Categorie introuvable.' });
+    }
+
+    const updatedProduct = await prisma.products.update({
+      where: { id: productId },
+      data: {
+        name: nom,
+        description,
+        price: prix,
+        stock: quantite,
+        category_id: categorieId,
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        stock: true,
+        category: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    return res.status(200).json({
+      message: 'Produit mis a jour avec succes.',
+      produit: {
+        id: updatedProduct.id,
+        nom: updatedProduct.name,
+        description: updatedProduct.description,
+        prix: updatedProduct.price,
+        quantite: updatedProduct.stock,
+        image_url: imageUrl,
+        categorie: updatedProduct.category,
+      },
+    });
+  } catch (error) {
+    return next(error);
+  }
+};

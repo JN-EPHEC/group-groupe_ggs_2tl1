@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
-import { getAdminProducts, updateAdminProductStock } from '../controllers/adminProductControllers';
+import { getAdminProducts, updateAdminProduct, updateAdminProductStock } from '../controllers/adminProductControllers';
 import { prismaMock } from './setup/prisma.singleton';
 
 const createResponse = () => {
@@ -157,6 +157,120 @@ describe('adminProductControllers', () => {
         quantite: 3,
         niveau_stock: 'faible',
         alerte_stock: true,
+      },
+    });
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  it('retourne 400 si URL image invalide lors de la modification produit', async () => {
+    const req = {
+      params: { id: '2' },
+      body: {
+        nom: 'Nouveau nom',
+        description: 'Desc',
+        prix: 99.9,
+        quantite: 12,
+        image_url: 'not-a-url',
+        categorie_id: 1,
+      },
+    } as unknown as Request;
+    const res = createResponse();
+    const next = jest.fn() as NextFunction;
+
+    await updateAdminProduct(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ message: "L'URL de l'image est invalide." });
+    expect(prismaMock.products.findUnique).not.toHaveBeenCalled();
+  });
+
+  it('retourne 404 si categorie introuvable lors de la modification produit', async () => {
+    const req = {
+      params: { id: '2' },
+      body: {
+        nom: 'Nouveau nom',
+        description: 'Desc',
+        prix: 99.9,
+        quantite: 12,
+        image_url: 'https://example.com/image.png',
+        categorie_id: 100,
+      },
+    } as unknown as Request;
+    const res = createResponse();
+    const next = jest.fn() as NextFunction;
+
+    prismaMock.products.findUnique.mockResolvedValue({ id: 2 } as never);
+    prismaMock.categories.findUnique.mockResolvedValue(null);
+
+    await updateAdminProduct(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith({ message: 'Categorie introuvable.' });
+    expect(prismaMock.products.update).not.toHaveBeenCalled();
+  });
+
+  it('met a jour un produit complet avec succes', async () => {
+    const req = {
+      params: { id: '2' },
+      body: {
+        nom: 'Produit modifie',
+        description: 'Description modifiee',
+        prix: 49.5,
+        quantite: 7,
+        image_url: 'https://example.com/new-image.png',
+        categorie_id: 4,
+      },
+    } as unknown as Request;
+    const res = createResponse();
+    const next = jest.fn() as NextFunction;
+
+    prismaMock.products.findUnique.mockResolvedValue({ id: 2 } as never);
+    prismaMock.categories.findUnique.mockResolvedValue({ id: 4, name: 'Boissons' } as never);
+    prismaMock.products.update.mockResolvedValue({
+      id: 2,
+      name: 'Produit modifie',
+      description: 'Description modifiee',
+      price: 49.5,
+      stock: 7,
+      category: { id: 4, name: 'Boissons' },
+    } as never);
+
+    await updateAdminProduct(req, res, next);
+
+    expect(prismaMock.products.update).toHaveBeenCalledWith({
+      where: { id: 2 },
+      data: {
+        name: 'Produit modifie',
+        description: 'Description modifiee',
+        price: 49.5,
+        stock: 7,
+        category_id: 4,
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        stock: true,
+        category: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({
+      message: 'Produit mis a jour avec succes.',
+      produit: {
+        id: 2,
+        nom: 'Produit modifie',
+        description: 'Description modifiee',
+        prix: 49.5,
+        quantite: 7,
+        image_url: 'https://example.com/new-image.png',
+        categorie: { id: 4, name: 'Boissons' },
       },
     });
     expect(next).not.toHaveBeenCalled();
