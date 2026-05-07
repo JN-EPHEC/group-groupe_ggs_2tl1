@@ -4,8 +4,8 @@ import addressRoutes from './routes/addressRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import authControllers from './routes/authRoutes.js'
 import verifyAccessToken from './middlewares/jwtMiddleware';
-
-
+import categoryRoutes from './routes/categoryRoutes.js';
+import productRoutes from './routes/productRoutes.js';
 import prisma from './config/prisma.js';
 import { requestLogger } from './middlewares/loggers.js';
 import { errorHandler } from "./middlewares/errorHandlers.js";
@@ -64,6 +64,8 @@ app.use('/api/addresses', verifyAccessToken,addressRoutes);
 app.use('/api/orders', verifyAccessToken,orderRoutes);
 app.use('/api/auth', authControllers)
 
+app.use('/api/categories', categoryRoutes);
+app.use('/api/produits', productRoutes);
 
 //app.use('/', rootRoutes);
 

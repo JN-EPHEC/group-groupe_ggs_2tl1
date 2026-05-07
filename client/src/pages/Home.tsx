@@ -1,3 +1,8 @@
+import { useEffect, useState } from "react";
+import ProductCard from "../components/ProductCard";
+import { getProducts } from "../services/productService";
+import type { Product } from "../types/product";
+
 //Home page 
 const categories = [
   { label: "Nouveautés", sub: "Collection printemps" },
@@ -5,14 +10,26 @@ const categories = [
   { label: "Accessoires", sub: "Compléter le look" },
 ];
 
-const featured = [
-  { title: "Veste structurée", price: "89,99 €", tag: "Nouveau" },
-  { title: "Pantalon tailleur", price: "69,99 €", tag: null },
-  { title: "Robe midi", price: "59,99 €", tag: "Tendance" },
-  { title: "Blazer oversize", price: "99,99 €", tag: null },
-];
-
 function Home(){
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [isLoadingFeatured, setIsLoadingFeatured] = useState(true);
+  const [featuredError, setFeaturedError] = useState<string | null>(null);
+
+  useEffect(() => {
+    getProducts({ limit: 4 })
+      .then((products) => {
+        setFeaturedProducts(products.slice(0, 4));
+        setFeaturedError(null);
+      })
+      .catch((error) => {
+        console.error("Erreur lors du chargement des produits en homepage:", error);
+        setFeaturedError("Impossible de charger la sélection du moment.");
+      })
+      .finally(() => {
+        setIsLoadingFeatured(false);
+      });
+  }, []);
+
     return(
  <main className="bg-white text-black">
 
@@ -73,31 +90,25 @@ function Home(){
         </div>
 
         <div className="grid grid-cols-4 gap-0.5">
-          {featured.map((product, i) => (
-            <div key={i} className="group cursor-pointer">
-              {/* Image placeholder */}
-              <div className="relative overflow-hidden aspect-[3/4]">
-                <div
-                  className={`w-full h-full flex items-center justify-center transition-transform duration-500 group-hover:scale-105 ${
-                    i % 2 === 0 ? "bg-[#e8e4df]" : "bg-[#ddd9d4]"
-                  }`}
-                >
-                  <span className="text-[10px] tracking-widest text-gray-400 uppercase">
-                    Photo
-                  </span>
-                </div>
-                {product.tag && (
-                  <span className="absolute top-4 left-4 text-[9px] tracking-widest uppercase bg-black text-white px-2 py-1">
-                    {product.tag}
-                  </span>
-                )}
-              </div>
-              <div className="pt-4 pb-2">
-                <p className="text-sm mb-1.5">{product.title}</p>
-                <p className="text-sm text-gray-500">{product.price}</p>
-              </div>
+          {isLoadingFeatured &&
+            Array.from({ length: 4 }).map((_, index) => (
+              <div
+                key={index}
+                className="h-[420px] bg-gray-200 animate-pulse rounded-sm"
+              />
+            ))}
+
+          {!isLoadingFeatured && featuredError && (
+            <div className="col-span-4 border border-red-200 rounded-sm p-6 bg-red-50">
+              <p className="text-sm text-red-700">{featuredError}</p>
             </div>
-          ))}
+          )}
+
+          {!isLoadingFeatured &&
+            !featuredError &&
+            featuredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
         </div>
       </section>
 

@@ -13,13 +13,17 @@ function Header() {
 
         {/* Left links */}
         <div className="flex gap-8 flex-1">
-          {["Femme", "Homme", "Nouveautés"].map((item) => (
+          {[
+            { label: "Accueil", href: "/" },
+            { label: "Produits", href: "/produits" },
+            { label: "Nouveautés", href: "/produits" },
+          ].map((item) => (
             <a
-              key={item}
-              href="#"
+              key={item.label}
+              href={item.href}
               className="text-[11px] tracking-widest uppercase text-black hover:opacity-40 transition-opacity duration-200"
             >
-              {item}
+              {item.label}
             </a>
           ))}
         </div>
