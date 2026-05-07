@@ -10,6 +10,7 @@ declare global {
 }
 
 const verifyAccessToken = (req: Request, res: Response, next: NextFunction) => {
+  console.log('Authorization header reçu:', req.headers.authorization)
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
