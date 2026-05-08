@@ -9,7 +9,7 @@ const API_URL = import.meta.env.VITE_API_URL
   const [email,    setEmail]   = useState("")
   const [password, setPassword] = useState("")
   const [error,    setError]   = useState("")
-  const [succes,  setSuccess] = useState(false)
+  const [sucess,  setSuccess] = useState(false)
   const navigate = useNavigate()
     // 1. Lors de la connexion
   const handleSubmit = async (e: FormEvent) => {
@@ -32,7 +32,8 @@ const API_URL = import.meta.env.VITE_API_URL
           throw new Error( 'Identifiants incorects')
         }
         localStorage.setItem("token", data.token)  
-        console.log(data.token)   
+        console.log(data.token)  
+      await fetchProfile() 
       navigate("/")  
 
       } catch (err) {
@@ -100,12 +101,18 @@ console.log("Token expire, veuillez vous reconnecter.");
                 className="bg-transparent border-b border-gray-300 focus:border-black outline-none py-2.5 text-sm placeholder:text-gray-300 transition-colors duration-200"
               />
             </div>
+            {error && 
+            ( <p className="text-red-500 text-[9px] tracking-[2px] uppercase">{error}</p>
+
+            )}
              <button
               type="submit"
+              disabled={sucess}
+  
               
               className="bg-black text-white text-[9px] tracking-[3px] uppercase py-4 hover:opacity-70 disabled:opacity-40 transition-opacity duration-200"
             >
-              Se connecter
+             {sucess ? "Connexion..." : "Se connecter"}
             </button>
            </form>
             <p className="text-center text-[9px] tracking-[2px] uppercase text-gray-400">
