@@ -69,6 +69,8 @@ app.use('/api/auth', authControllers)
 app.use('/api/products', prodRoutes);
 app.use('/api/categories', catRoutes);
 
+app.use('/api/categories', catRoutes);
+app.use('/api/produits', prodRoutes);
 
 //app.use('/', rootRoutes);
 
