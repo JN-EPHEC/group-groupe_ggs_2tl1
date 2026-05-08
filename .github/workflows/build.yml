@@ -4,7 +4,6 @@ on:
   workflow_run:
     workflows: ["Continuous Integration - Tests"]
     types: [completed]
-    branches: [dev,main]
 
 jobs:
   build-back:
