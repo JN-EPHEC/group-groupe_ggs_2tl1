@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { setStoredUser, setToken } from "../utils/auth";
 
 
@@ -138,8 +138,10 @@ if (profile && typeof profile === "object") {
            </form>
             <p className="text-center text-[9px] tracking-[2px] uppercase text-gray-400">
             Pas encore de compte ?
-            <a href='/register'> Cliquez ici
-            </a>
+            <Link to="/inscription" className="text-black hover:opacity-40">
+              {" "}
+              Cliquez ici
+            </Link>
             </p>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL 
 
@@ -62,7 +62,7 @@ function Register() {
       }
 
       setSuccess("Compte cree avec succes.");
-      setTimeout(() => navigate("/login"), 900);
+      setTimeout(() => navigate("/connexion"), 900);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");
     } 
@@ -228,9 +228,9 @@ function Register() {
 
           <p className="text-center text-[9px] tracking-[2px] uppercase text-gray-400">
             Deja un compte ?{" "}
-            <a href="/login" className="text-black hover:opacity-40">
+            <Link to="/connexion" className="text-black hover:opacity-40">
               Se connecter
-            </a>
+            </Link>
           </p>
         </div>
       </div>
