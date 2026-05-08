@@ -1,8 +1,7 @@
 name: Continuous Deployment - Frontend
 on:
-   workflow_run:
-    workflows: ["Continuous Integration - Tests"]  # ← le nom exact de ton CI
-    types: [completed]
+   push:
+    branches: [dev, main]
 jobs:
   deploy-frontend:
     runs-on: ubuntu-latest
