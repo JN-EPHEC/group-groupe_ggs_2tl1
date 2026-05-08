@@ -71,11 +71,7 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
     const userId = Number(req.user.id);
 
     //Récupère les données founies par le client - undefined si rien
-    const rawItems = req.body?.items;
-
-    if (!Array.isArray(rawItems) || rawItems.length === 0) {
-      return res.status(400).json({ message: "La commande doit contenir au moins un item" });
-    }
+    const rawItems = req.body.items;
 
     //crée un nouvel objet avec un typage personnalisé -- Permet d'éviter toute introduction de mauvaise valeur de la part du client
     const parsedItems: CreateOrderItemInput[] = rawItems.map((item: unknown) => {
@@ -85,20 +81,6 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
         quantity: Number(candidate.quantity),
       };
     });
-
-    //cherche la premiere ocurrence qui serait mauvaise dans le nouveal objet
-    const invalidItem = parsedItems.find(
-      (item) =>
-        !Number.isInteger(item.product_id) ||
-        item.product_id <= 0 ||
-        !Number.isInteger(item.quantity) ||
-        item.quantity <= 0
-    );
-
-    //Si un item est invalide, on sort et renvoie une erreur 400
-    if (invalidItem) {
-      return res.status(400).json({ message: "Items invalides: product_id et quantity (> 0) sont requis" });
-    }
 
     //Regrouppe les items par produit et additionne les quantités
     const quantitiesByProduct = new Map<number, number>();

@@ -1,5 +1,6 @@
 import express from 'express';
 import * as authControllers from '../controllers/authControllers';
+import { validateLoginBody, validateRegisterBody } from '../middlewares/validateAuthBody.js';
 
 const router = express.Router();
 
@@ -36,7 +37,7 @@ const router = express.Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/register', authControllers.authRegister);
+router.post('/register', validateRegisterBody, authControllers.authRegister);
 
 /**
  * @swagger
@@ -71,12 +72,11 @@ router.post('/register', authControllers.authRegister);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/login', authControllers.authLogin);
+router.post('/login', validateLoginBody, authControllers.authLogin);
 
 //Permet au client de se déconnecter
 //router.post('/logout',authLogout);
 
 
 export default router;
-
 

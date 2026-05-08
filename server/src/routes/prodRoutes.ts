@@ -6,10 +6,9 @@ import * as prodControllers from '../controllers/prodControllers'
 const router = express.Router();
 
 // GET all products (Public)
-router.get('/',checkIdParam,prodControllers.getAllProduct);
+router.get('/',prodControllers.getAllProduct);
 
 // GET one product (Public)
 router.get('/:id',checkIdParam,prodControllers.getProduct)
 
 export default router;
-

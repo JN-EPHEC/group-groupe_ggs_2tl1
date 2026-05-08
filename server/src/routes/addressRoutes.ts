@@ -1,5 +1,8 @@
 import express from "express";
 import * as addressControllers from "../controllers/addressControllers.js";
+import checkIdParam from "../middlewares/checkIdParam.js";
+import checkEmptyBody from "../middlewares/checkEmptyBody.js";
+import validateAddressBody from "../middlewares/validateAddressBody.js";
 
 const router = express.Router();
 
@@ -68,17 +71,17 @@ router.get("/me", addressControllers.getMyAddresses);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post("/me", addressControllers.createMyAddress);
+router.post("/me", validateAddressBody, addressControllers.createMyAddress);
 
 /**
  * @swagger
- * /api/addresses/me/{addressId}:
+ * /api/addresses/me/{id}:
  *   patch:
  *     summary: Modifier une adresse
  *     tags: [Adresses]
  *     parameters:
  *       - in: path
- *         name: addressId
+ *         name: id
  *         required: true
  *         schema:
  *           type: integer
@@ -115,17 +118,17 @@ router.post("/me", addressControllers.createMyAddress);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.patch("/me/:addressId", addressControllers.updateMyAddress);
+router.patch("/me/:id", checkIdParam, checkEmptyBody, addressControllers.updateMyAddress);
 
 /**
  * @swagger
- * /api/addresses/me/{addressId}:
+ * /api/addresses/me/{id}:
  *   delete:
  *     summary: Supprimer une adresse
  *     tags: [Adresses]
  *     parameters:
  *       - in: path
- *         name: addressId
+ *         name: id
  *         required: true
  *         schema:
  *           type: integer
@@ -152,6 +155,6 @@ router.patch("/me/:addressId", addressControllers.updateMyAddress);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.delete("/me/:addressId", addressControllers.deleteMyAddress);
+router.delete("/me/:id", checkIdParam, addressControllers.deleteMyAddress);
 
 export default router;

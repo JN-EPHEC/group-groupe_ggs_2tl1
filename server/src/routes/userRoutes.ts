@@ -1,7 +1,6 @@
 import express from 'express';
 import * as userControllers from '../controllers/userControllers';
-import checkIdParam from '../middlewares/checkIdParam.js';
-import checkUser from '../middlewares/checkUser.js';
+import checkEmptyBody from '../middlewares/checkEmptyBody.js';
 
 const router = express.Router();
 
@@ -10,12 +9,12 @@ const router = express.Router();
 router.get('/me',userControllers.getProfile);
 
 //Permet de modifier le profil du client
-router.patch('/me',userControllers.modifyClient);
+router.patch('/me', checkEmptyBody, userControllers.modifyClient);
 
 //Permet de changer le mot de passe du client
-router.patch('/me/password',userControllers.modifyPassword);
+router.patch('/me/password', checkEmptyBody, userControllers.modifyPassword);
 
 //Permet de supprimer son compte
-router.delete('/me',userControllers.deleteAccount);
+router.delete('/me', checkEmptyBody, userControllers.deleteAccount);
 
 export default router;

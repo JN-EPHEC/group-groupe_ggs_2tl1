@@ -22,20 +22,9 @@ export const authRegister = async (req: Request, res: Response, next: NextFuncti
         //récupères les données foournies par le formulaire de création de compte maos partiellement
         const input = req.body as Partial<CreateUserInput>;
 
-        //permet de vérifier si les types des champs sont bons
-        if (typeof input.username !== "string" || typeof input.email !== "string" || typeof input.password !== "string") {
-            return res.status(400).json({ message: "Types invalides" });
-        }
-
-        //Permet de verifier que l'emai lest dans le bon format
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(input.email)) {
-            return res.status(400).json({ message: "Format email invalide" })
-        }
-
         //Permet de verifier si l'email n'est pas deja present dans la db 
         const verifyEmail = await prisma.user.findUnique({
-            where: { email: input.email }
+            where: { email: input.email! }
         })
 
         if (verifyEmail) {
@@ -44,7 +33,7 @@ export const authRegister = async (req: Request, res: Response, next: NextFuncti
 
         //Génère un salt et hash le password
         const salt = randomBytes(16).toString("hex");
-        const password_hash = scryptSync(input.password, salt, 64).toString("hex");
+        const password_hash = scryptSync(input.password!, salt, 64).toString("hex");
 
         //transaction de création de user
         const createUser = await prisma.$transaction(async (tx) => {
@@ -107,14 +96,9 @@ export const authLogin = async (req: Request, res: Response, next: NextFunction)
     try {
         const input = req.body as Partial<CreateUserInput>;
 
-        // Vérification des types
-        if (typeof input.email !== "string" || typeof input.password !== "string") {
-            return res.status(400).json({ message: "Types invalides" });
-        }
-
         // Cherche l'utilisateur + credentials
         const user = await prisma.user.findUnique({
-            where: { email: input.email },
+            where: { email: input.email! },
             include: { credentials: true }
         });
 
@@ -124,7 +108,7 @@ export const authLogin = async (req: Request, res: Response, next: NextFunction)
         }
 
         // Recalcul du hash avec le salt stocké
-        const hashToCompare = scryptSync(input.password, user.credentials.salt, 64).toString("hex");
+        const hashToCompare = scryptSync(input.password!, user.credentials.salt, 64).toString("hex");
 
         // Comparaison
         if (hashToCompare !== user.credentials.password_hash) {

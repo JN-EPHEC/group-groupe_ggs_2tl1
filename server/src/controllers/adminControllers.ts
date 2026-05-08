@@ -7,10 +7,6 @@ import prisma from '../config/prisma.js'
 export const createProduct = async (req:Request, res: Response, next: NextFunction) =>{
     try{
     const data = req.body
-    if (!data || Object.keys(data).length === 0){
-        return res.status(400).json({message : "Erreur lors de la création de produit"})
-
-    }
      const product = await prisma.products.create({
         data : data
     });
@@ -47,9 +43,6 @@ export const modifyProduct = async (req:Request, res:Response,next :  NextFuncti
             return res.status(404).json({message : "le produit n'existe pas ou plus" })
         }
         const data = req.body
-        if (!data || Object.keys(data).length === 0){
-            return res.status(400).json({message : "Le body est vide "})
-        }
         const product = await prisma.products.update({
         where : {id : Number(id)},
         data : data
@@ -94,10 +87,6 @@ export const getAllUsers = async (req: Request, res: Response, next: NextFunctio
 export const getUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const userId = Number(req.params.id);
-        
-        if (!Number.isInteger(userId) || userId <= 0) {
-            return res.status(400).json({ message: "ID utilisateur invalide" });
-        }
 
         const user = await prisma.user.findUnique({
             where: { id: userId },
@@ -134,10 +123,6 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
 export const modifyUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const userId = Number(req.params.id);
-
-        if (!Number.isInteger(userId) || userId <= 0) {
-            return res.status(400).json({ message: "ID utilisateur invalide" });
-        }
 
         const exists = await prisma.user.findUnique({
             where: { id: userId },
@@ -190,10 +175,6 @@ export const createAdmin = async (req: Request, res: Response, next: NextFunctio
     try {
         const data = req.body;
 
-        if (!data || Object.keys(data).length === 0) {
-            return res.status(400).json({ message: "Erreur lors de la création d'admin" });
-        }
-
         // Récupérer le rôle "admin"
         const adminRole = await prisma.role.findUnique({
             where: { name: "admin" },
@@ -242,10 +223,6 @@ export const createAdmin = async (req: Request, res: Response, next: NextFunctio
 export const deleteAdmin = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const userId = Number(req.params.id);
-
-        if (!Number.isInteger(userId) || userId <= 0) {
-            return res.status(400).json({ message: "ID utilisateur invalide" });
-        }
 
         const user = await prisma.user.findUnique({
             where: { id: userId },
@@ -297,10 +274,6 @@ export const deleteAdmin = async (req: Request, res: Response, next: NextFunctio
 export const createCat = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const data = req.body;
-
-        if (!data || Object.keys(data).length === 0) {
-            return res.status(400).json({ message: "Erreur lors de la création de catégorie" });
-        }
 
         const category = await prisma.categories.create({
             data: data,

@@ -1,5 +1,7 @@
 import express from 'express'
 import * as adminControllers from '../controllers/adminControllers.js'
+import checkEmptyBody from '../middlewares/checkEmptyBody.js'
+import checkIdParam from '../middlewares/checkIdParam.js'
 
 const router = express.Router();
 
@@ -7,28 +9,28 @@ const router = express.Router();
 router.get('/users', adminControllers.getAllUsers);
 
 // Renvoie un seul user
-router.get('/users/:id', adminControllers.getUser);
+router.get('/users/:id', checkIdParam, adminControllers.getUser);
 
 // Modifie un user (role, statut, etc.)
-router.patch('/users/:id', adminControllers.modifyUser);
+router.patch('/users/:id', checkIdParam, checkEmptyBody, adminControllers.modifyUser);
 
 // Supprime un user
-router.delete('/users/:id', adminControllers.deleteAdmin);
+router.delete('/users/:id', checkIdParam, adminControllers.deleteAdmin);
 
 // Crée un user admin
-router.post('/users', adminControllers.createAdmin);
+router.post('/users', checkEmptyBody, adminControllers.createAdmin);
 
 // Ajoute un produit
-router.post('/products', adminControllers.createProduct);
+router.post('/products', checkEmptyBody, adminControllers.createProduct);
 
 // Modifie un produit
-router.patch('/products/:id',adminControllers.modifyProduct);
+router.patch('/products/:id', checkIdParam, checkEmptyBody, adminControllers.modifyProduct);
 
 // Supprime un produit
-router.delete('/products/:id', adminControllers.deleteProduct);
+router.delete('/products/:id', checkIdParam, adminControllers.deleteProduct);
 
 // Ajoute une catégorie
-router.post('/categories', adminControllers.createCat);
+router.post('/categories', checkEmptyBody, adminControllers.createCat);
 
 
 export default router;
