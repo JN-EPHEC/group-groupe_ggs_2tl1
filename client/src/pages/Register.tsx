@@ -32,7 +32,7 @@ function Register() {
     if(!password.match(/[A-Z]/)){wrongPwd +='une majuscule '; }
     if(!password.match(/[a-z]/)){wrongPwd +='une minuscule '; }
     if(!password.match(/[0-9]/)){wrongPwd +='un nombre'; }
-    if(!password.match(/[!@#$%^&*(),.?":{}|<>_\-\\[\]\/+=]/)){wrongPwd +='un caractère spécial '; }
+    if(!password.match(/[!@#$%^&*(),.?":{}|<>_\-\\[\]/+=]/)){wrongPwd +='un caractère spécial '; }
     if (password !== confirmPassword) {setError("Les mots de passe ne correspondent pas.");return;}
     if(wrongPwd.length > 0) {setError(wrongPwd); return}
     try {

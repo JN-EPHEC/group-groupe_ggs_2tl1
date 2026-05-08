@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import { getProductById } from "../services/productService";
 import type { Product } from "../types/product";
 
@@ -10,10 +11,7 @@ const PRICE_FORMATTER = new Intl.NumberFormat("fr-BE", {
 });
 
 function ProductDetail() {
-  const productId = useMemo(() => {
-    const parts = window.location.pathname.split("/").filter(Boolean);
-    return parts[1] ?? "";
-  }, []);
+  const { id: productId = "" } = useParams();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -41,12 +39,29 @@ function ProductDetail() {
   return (
     <main className="bg-white text-black min-h-[70vh] px-6 md:px-10 py-10">
       <section className="max-w-4xl mx-auto">
-        <a
-          href="/produits"
-          className="inline-block text-[10px] tracking-[3px] uppercase text-gray-600 hover:opacity-60 mb-6"
-        >
-          Retour a la liste
-        </a>
+        <nav aria-label="Fil d’Ariane" className="mb-6">
+          <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] tracking-[3px] uppercase text-gray-600">
+            <li>
+              <Link to="/" className="hover:opacity-60">
+                Accueil
+              </Link>
+            </li>
+            <li aria-hidden="true" className="text-gray-400">
+              &gt;
+            </li>
+            <li>
+              <Link to="/produits" className="hover:opacity-60">
+                Produits
+              </Link>
+            </li>
+            <li aria-hidden="true" className="text-gray-400">
+              &gt;
+            </li>
+            <li className="text-gray-800">
+              {isLoading ? "Chargement…" : errorMessage ? "Détail" : product?.name ?? "Détail"}
+            </li>
+          </ol>
+        </nav>
 
         {isLoading && <p className="text-sm text-gray-700">Chargement du produit...</p>}
 
