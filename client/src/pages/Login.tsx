@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import {useNavigate} from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
+import { setStoredUser, setToken } from "../utils/auth";
 
 
 const API_URL = import.meta.env.VITE_API_URL
@@ -31,9 +32,9 @@ const API_URL = import.meta.env.VITE_API_URL
         if(!response.ok){
           throw new Error( 'Identifiants incorects')
         }
-        localStorage.setItem("token", data.token)  
+        setToken(data.token);
         console.log(data.token)  
-      await fetchProfile() 
+      await fetchProfile();
       navigate("/")  
 
       } catch (err) {
@@ -54,6 +55,26 @@ headers: {
 if (response.status === 401) {
 // Le token a expire ! Il faudrait appeler la route /refresh ici.
 console.log("Token expire, veuillez vous reconnecter.");
+return;
+}
+if (!response.ok) {
+  return;
+}
+const profile = await response.json();
+if (profile && typeof profile === "object") {
+  const username = (profile as { username?: unknown; name?: unknown }).username ?? (profile as { name?: unknown }).name;
+  const emailValue = (profile as { email?: unknown }).email;
+  const roleValue = (profile as { role?: unknown }).role;
+  const rolesValue = (profile as { roles?: unknown }).roles;
+  const isAdminValue = (profile as { isAdmin?: unknown }).isAdmin;
+
+  setStoredUser({
+    username: typeof username === "string" ? username : undefined,
+    email: typeof emailValue === "string" ? emailValue : undefined,
+    role: typeof roleValue === "string" ? roleValue : undefined,
+    roles: Array.isArray(rolesValue) || typeof rolesValue === "string" ? (rolesValue as string[] | string) : undefined,
+    isAdmin: isAdminValue === true,
+  });
 }
 };
   

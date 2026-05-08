@@ -1,18 +1,30 @@
 import { useMemo, useState } from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { clearAuth, getStoredUser, isAdminUser, isAuthenticated } from "../utils/auth";
 
 function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const isConnected = useMemo(() => {
+  const authSnapshot = useMemo(() => {
     void location.pathname; // trigger recompute on navigation
-    return Boolean(localStorage.getItem("token"));
+    const user = getStoredUser();
+    const connected = isAuthenticated();
+    const displayName = user?.username ?? user?.email ?? null;
+    const admin = isAdminUser(user);
+    return { connected, displayName, admin };
   }, [location.pathname]);
 
   const navLinkClassName = ({ isActive }: { isActive: boolean }) =>
     `text-[11px] tracking-widest uppercase transition-opacity duration-200 ${
       isActive ? "text-black border-b border-black pb-0.5" : "text-black hover:opacity-40"
     }`;
+
+  const logout = () => {
+    clearAuth();
+    setIsMobileMenuOpen(false);
+    navigate("/");
+  };
 
   return (
     <header>
@@ -67,14 +79,36 @@ function Header() {
 
           {/* Right (desktop) */}
           <div className="hidden md:flex items-center gap-6 flex-1 justify-end">
-            {isConnected ? (
-              <NavLink to="/compte" className={navLinkClassName}>
-                Espace personnel
-              </NavLink>
+            {authSnapshot.connected ? (
+              <div className="flex items-center gap-6">
+                <span className="text-[11px] tracking-widest uppercase text-gray-600">
+                  {authSnapshot.displayName ?? "Utilisateur"}
+                </span>
+                <NavLink to="/compte" className={navLinkClassName}>
+                  Mon compte
+                </NavLink>
+                {authSnapshot.admin && (
+                  <NavLink to="/admin" className={navLinkClassName}>
+                    Admin
+                  </NavLink>
+                )}
+                <button
+                  type="button"
+                  onClick={logout}
+                  className="text-[11px] tracking-widest uppercase text-black hover:opacity-40 transition-opacity duration-200"
+                >
+                  Déconnexion
+                </button>
+              </div>
             ) : (
-              <NavLink to="/connexion" className={navLinkClassName}>
-                Connexion
-              </NavLink>
+              <div className="flex items-center gap-6">
+                <NavLink to="/connexion" className={navLinkClassName}>
+                  Connexion
+                </NavLink>
+                <NavLink to="/inscription" className={navLinkClassName}>
+                  Créer un compte
+                </NavLink>
+              </div>
             )}
             <NavLink to="/panier" className={navLinkClassName}>
               Panier
@@ -113,14 +147,35 @@ function Header() {
               >
                 Panier
               </NavLink>
-              {isConnected ? (
-                <NavLink
-                  to="/compte"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={navLinkClassName}
-                >
-                  Espace personnel
-                </NavLink>
+              {authSnapshot.connected ? (
+                <div className="flex flex-col gap-3">
+                  <span className="text-[11px] tracking-widest uppercase text-gray-600">
+                    {authSnapshot.displayName ?? "Utilisateur"}
+                  </span>
+                  <NavLink
+                    to="/compte"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={navLinkClassName}
+                  >
+                    Mon compte
+                  </NavLink>
+                  {authSnapshot.admin && (
+                    <NavLink
+                      to="/admin"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={navLinkClassName}
+                    >
+                      Admin
+                    </NavLink>
+                  )}
+                  <button
+                    type="button"
+                    onClick={logout}
+                    className="text-[11px] tracking-widest uppercase text-black hover:opacity-40 transition-opacity duration-200 text-left"
+                  >
+                    Déconnexion
+                  </button>
+                </div>
               ) : (
                 <div className="flex flex-col gap-3">
                   <NavLink
