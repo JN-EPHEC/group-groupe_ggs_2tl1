@@ -18,13 +18,13 @@ jobs:
           docker build -f server/Dockerfile -t erreur504/ggs-api:latest .
           docker push erreur504/ggs-api:latest
 
-     # - name: Deploy back sur VPS
-      #  uses: appleboy/ssh-action@v1.0.0
-       # with:
-        #  host: ${{ secrets.SERVER_IP }}
-         # username: ${{ secrets.SERVER_USER }}
-          #key: ${{ secrets.SSH_PRIVATE_KEY }}
-          #port: ${{ secrets.SERVER_PORT }}
-          #script: |
-           # cd ~/GGS
+      - name: Deploy back sur VPS
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            cd ~/GGS
             #docker stack deploy -c docker-compose.yml ggs --with-registry-auth
