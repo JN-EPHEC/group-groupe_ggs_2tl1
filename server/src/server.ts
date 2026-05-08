@@ -1,6 +1,14 @@
 import express from 'express';
 import userRoutes from './routes/userRoutes.js';
-import jwtRoutes from './routes/jwtRoutes.js'
+import addressRoutes from './routes/addressRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
+import authControllers from './routes/authRoutes.js';
+import adminUserRoutes from './routes/adminUserRoutes.js';
+import prodRoutes from './routes/prodRoutes.js';
+import catRoutes from './routes/catRoutes.js';
+import verifyAuth from './middlewares/requireAuth.js';
+import verifyAdmin from './middlewares/requireAdmin.js';
+
 import prisma from './config/prisma.js';
 import { requestLogger } from './middlewares/loggers.js';
 import { errorHandler } from "./middlewares/errorHandlers.js";
@@ -48,11 +56,21 @@ if (process.env.NODE_ENV !== "production") {
 
 app.use(express.json());
 
+//logger
+
 app.use(requestLogger)
 
-app.use('/api/users', userRoutes);
+// Mode test temporaire: on ne monte que les routes users
+app.use('/api/admin',verifyAuth,verifyAdmin,adminUserRoutes)
+app.use('/api/users', verifyAuth,userRoutes);
+app.use('/api/addresses', verifyAuth,addressRoutes);
+app.use('/api/orders', verifyAuth,orderRoutes);
+app.use('/api/auth', authControllers)
+app.use('/api/products', prodRoutes);
+app.use('/api/categories', catRoutes);
 
-app.use('/api/auth/login',jwtRoutes)
+app.use('/api/categories', catRoutes);
+app.use('/api/produits', prodRoutes);
 
 //app.use('/', rootRoutes);
 

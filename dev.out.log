@@ -1,0 +1,43 @@
+
+> dev3-backend-tp1@1.0.0 predev
+> prisma generate
+
+◇ injected env (2) from .env.dev // tip: ⌘ suppress logs { quiet: true }
+Prisma schema loaded from prisma\schema.prisma
+
+✔ Generated Prisma Client (v6.19.3) to .\server\node_modules\.prisma\client in 200ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Interested in query caching in just a few lines of code? Try Accelerate today! https://pris.ly/tip-3-accelerate
+
+
+> dev3-backend-tp1@1.0.0 dev
+> concurrently --kill-others-on-fail --names server,client --prefix-colors blue,magenta "npm run dev:server" "npm run dev:client"
+
+[server] 
+[server] > dev3-backend-tp1@1.0.0 dev:server
+[server] > npm --prefix server run dev
+[server] 
+[client] 
+[client] > dev3-backend-tp1@1.0.0 dev:client
+[client] > npm --prefix client run dev
+[client] 
+[server] 
+[server] > dev3-backend-tp1@1.0.0 dev
+[server] > tsx watch src/server.ts
+[server] 
+[client] 
+[client] > client@0.0.0 dev
+[client] > vite
+[client] 
+[client] 
+[client]   [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m1364[22m[2m[0m ms[22m
+[client] 
+[client]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[client] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[server] Database connected.
+[server] Server started on http://localhost:3000.
+[client] npm run dev:client exited with code 4294967295
+--> Sending SIGTERM to other processes..
+[server] npm run dev:server exited with code 1

@@ -4,7 +4,7 @@ import * as rootControllers from '../controllers/rootControllers.js'
 const router = express.Router();
 
 /**
- * @swagger
+ * swagger
  * /:
  *   get:
  *     summary: Affiche la route racine de l'API
