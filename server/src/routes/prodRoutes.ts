@@ -1,6 +1,6 @@
 import express from 'express';
-import checkIdParam from '../middlewares/checkIdParam';
-import * as prodControllers from '../controllers/prodControllers'
+import checkIdParam from '../middlewares/checkIdParam.js';
+import * as prodControllers from '../controllers/prodControllers.js'
 
 
 const router = express.Router();

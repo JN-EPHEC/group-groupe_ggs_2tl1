@@ -1,6 +1,6 @@
 import express from 'express';
-import checkIdParam from '../middlewares/checkIdParam';
-import * as catControllers from '../controllers/catControllers'
+import checkIdParam from '../middlewares/checkIdParam.js';
+import * as catControllers from '../controllers/catControllers.js'
 
 const router = express.Router();
 

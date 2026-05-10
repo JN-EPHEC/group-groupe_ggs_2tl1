@@ -6,6 +6,7 @@ import authControllers from './routes/authRoutes.js';
 import adminUserRoutes from './routes/adminUserRoutes.js';
 import prodRoutes from './routes/prodRoutes.js';
 import catRoutes from './routes/catRoutes.js';
+import productRoutes from './routes/productRoutes.js';
 import verifyAuth from './middlewares/requireAuth.js';
 import verifyAdmin from './middlewares/requireAdmin.js';
 
@@ -68,9 +69,7 @@ app.use('/api/orders', verifyAuth,orderRoutes);
 app.use('/api/auth', authControllers)
 app.use('/api/products', prodRoutes);
 app.use('/api/categories', catRoutes);
-
-app.use('/api/categories', catRoutes);
-app.use('/api/produits', prodRoutes);
+app.use('/api/produits', productRoutes);
 
 //app.use('/', rootRoutes);
 

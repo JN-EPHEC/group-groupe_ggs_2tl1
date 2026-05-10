@@ -1,5 +1,6 @@
 import express from 'express';
 import { getProductById, getProducts } from '../controllers/productControllers.js';
+import checkIdParam from '../middlewares/checkIdParam.js';
 
 const router = express.Router();
 
@@ -67,6 +68,6 @@ router.get('/', getProducts);
  *       500:
  *         description: Erreur serveur
  */
-router.get('/:id', getProductById);
+router.get('/:id', checkIdParam, getProductById);
 
 export default router;
