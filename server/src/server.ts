@@ -61,7 +61,6 @@ app.use(express.json());
 
 app.use(requestLogger)
 
-// Mode test temporaire: on ne monte que les routes users
 app.use('/api/admin',verifyAuth,verifyAdmin,adminUserRoutes)
 app.use('/api/users', verifyAuth,userRoutes);
 app.use('/api/addresses', verifyAuth,addressRoutes);
