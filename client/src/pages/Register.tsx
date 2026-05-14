@@ -36,7 +36,7 @@ function Register() {
     if (password !== confirmPassword) {setError("Les mots de passe ne correspondent pas.");return;}
     if(wrongPwd.length > 0) {setError(wrongPwd); return}
     try {
-      const response = await fetch(`${API_URL}/api/auth/register`, {
+      const response = await fetch(`api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

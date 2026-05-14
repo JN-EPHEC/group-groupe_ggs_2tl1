@@ -9,6 +9,7 @@ import catRoutes from './routes/catRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import verifyAuth from './middlewares/requireAuth.js';
 import verifyAdmin from './middlewares/requireAdmin.js';
+import authRoutes from './routes/authRoutes.js';
 
 import prisma from './config/prisma.js';
 import { requestLogger } from './middlewares/loggers.js';
@@ -69,6 +70,7 @@ app.use('/api/auth', authControllers)
 app.use('/api/products', prodRoutes);
 app.use('/api/categories', catRoutes);
 app.use('/api/produits', productRoutes);
+app.use('/api/auth/',verifyAuth,authRoutes);
 
 //app.use('/', rootRoutes);
 

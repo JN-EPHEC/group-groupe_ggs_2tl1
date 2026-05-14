@@ -17,7 +17,7 @@ const API_URL = import.meta.env.VITE_API_URL
     setError("");
     setSuccess(true);
     try{
-      const response = await fetch(`${API_URL}/api/auth/login`, {
+      const response = await fetch(`/api/auth/login`, {
         method: "POST",
         headers : {"Content-Type": "application/json"},
         body : JSON.stringify({
@@ -46,7 +46,7 @@ const API_URL = import.meta.env.VITE_API_URL
 const fetchProfile = async () => {
 const token = localStorage.getItem('token');
 
-const response = await fetch(`${API_URL}/api/users/me`, {
+const response = await fetch(`/api/users/me`, {
 headers: {
 'Authorization': `Bearer ${token}`
 }
