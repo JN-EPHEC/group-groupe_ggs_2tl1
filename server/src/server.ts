@@ -10,6 +10,8 @@ import productRoutes from './routes/productRoutes.js';
 import verifyAuth from './middlewares/requireAuth.js';
 import verifyAdmin from './middlewares/requireAdmin.js';
 import authRoutes from './routes/authRoutes.js';
+import checkoutRoutes from "./routes/checkoutRoutes.js";
+
 
 import prisma from './config/prisma.js';
 import { requestLogger } from './middlewares/loggers.js';
@@ -71,6 +73,8 @@ app.use('/api/products', prodRoutes);
 app.use('/api/categories', catRoutes);
 app.use('/api/produits', productRoutes);
 app.use('/api/auth/',verifyAuth,authRoutes);
+app.use("/api/checkout", verifyAuth, checkoutRoutes);
+
 
 //app.use('/', rootRoutes);
 

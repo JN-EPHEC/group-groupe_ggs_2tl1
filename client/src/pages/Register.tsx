@@ -2,9 +2,6 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = import.meta.env.VITE_API_URL 
-
-
 function Register() {
 // défition des variables d'état. [variable,fonction]
   const navigate = useNavigate();

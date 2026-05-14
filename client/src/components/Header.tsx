@@ -1,14 +1,31 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { CART_UPDATED_EVENT, getCartCount } from "../services/cartService";
 
 function Header() {
   const location = useLocation()
   const [isConnected, setIsconnected] =useState(false)
+  const [cartCount, setCartCount] = useState(0)
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     setIsconnected(Boolean(token));
+    setCartCount(getCartCount());
 
   }, [location.pathname]);
+
+  useEffect(() => {
+    const refreshCartCount = () => {
+      setCartCount(getCartCount());
+    };
+
+    window.addEventListener(CART_UPDATED_EVENT, refreshCartCount);
+
+    return () => {
+      window.removeEventListener(CART_UPDATED_EVENT, refreshCartCount);
+    };
+  }, []);
+
   const logout = ( ) =>{
     localStorage.removeItem("token");
       setIsconnected(false)
@@ -74,7 +91,7 @@ function Header() {
             href="/panier"
             className="text-[11px] tracking-widest uppercase text-black hover:opacity-40 transition-opacity duration-200"
           >
-            Panier (0)
+            Panier ({cartCount})
           </a>
         </div>
       </nav>

@@ -210,6 +210,7 @@
     "string-width": "^4.2.3",
     "strip-ansi": "^6.0.1",
     "strip-json-comments": "^2.0.1",
+    "stripe": "^22.1.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-parser": "^10.0.3",
     "swagger-ui-dist": "^5.31.1",

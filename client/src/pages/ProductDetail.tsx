@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { getProductById } from "../services/productService";
+import { addToCart } from "../services/cartService";
 import type { Product } from "../types/product";
 
 const PRICE_FORMATTER = new Intl.NumberFormat("fr-BE", {
@@ -18,6 +19,7 @@ function ProductDetail() {
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [cartMessage, setCartMessage] = useState<string | null>(null);
 
   useEffect(() => {
     getProductById(productId)
@@ -69,11 +71,18 @@ function ProductDetail() {
             </p>
             <button
               type="button"
+              onClick={() => {
+                addToCart(product);
+                setCartMessage("Produit ajouté au panier.");
+              }}
               disabled={(product.stock ?? 0) <= 0}
               className="px-5 py-3 text-xs tracking-widest uppercase border border-black bg-black text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Ajouter au panier
             </button>
+            {cartMessage && (
+              <p className="mt-4 text-sm text-gray-700">{cartMessage}</p>
+            )}
           </article>
         )}
       </section>
