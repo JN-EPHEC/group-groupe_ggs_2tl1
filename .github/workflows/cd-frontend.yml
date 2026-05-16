@@ -1,22 +1,21 @@
 name: Continuous Deployment - Frontend
 on:
-   workflow_run:
-    workflows: ["Continuous Integration - Tests"]  # ← le nom exact de ton CI
-    types: [completed]
+   push:
+    branches: [dev, main,ci/cd]
 jobs:
   deploy-frontend:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - uses: actions/checkout@v3
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
+          node-version: '20.x'
 
       - name: Install dependencies and Build
         run: |
+          rm -rf node_modules package-lock.json
           npm install
           npm run build
         working-directory: ./client
