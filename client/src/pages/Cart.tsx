@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   CART_UPDATED_EVENT,
   clearCart,
@@ -84,7 +85,7 @@ function Cart() {
 
   return (
     <main className="bg-white text-black min-h-[70vh] px-6 md:px-10 py-10">
-      <section className="max-w-4xl mx-auto">
+      <section className="max-w-5xl mx-auto">
         <p className="text-[10px] tracking-[3px] uppercase text-gray-500 mb-3">
           Panier
         </p>
@@ -95,12 +96,12 @@ function Cart() {
         {cart.length === 0 ? (
           <div className="border border-gray-200 rounded-sm p-6 md:p-8 bg-[#faf9f7]">
             <p className="text-sm text-gray-700 mb-6">Votre panier est vide.</p>
-            <a
-              href="/produits"
+            <Link
+              to="/produits"
               className="inline-block px-5 py-3 text-xs tracking-widest uppercase border border-black bg-black text-white hover:opacity-70 transition-opacity"
             >
               Voir les produits
-            </a>
+            </Link>
           </div>
         ) : (
           <div className="border border-gray-200 rounded-sm p-6 md:p-8 bg-[#faf9f7]">

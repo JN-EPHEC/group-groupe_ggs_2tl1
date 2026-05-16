@@ -1,13 +1,19 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Header from "./components/Header.tsx";
 import Footer from "./components/Footer.tsx";
+import Account from "./pages/Account.tsx";
+import Admin from "./pages/Admin.tsx";
 import Cart from "./pages/Cart.tsx";
 import CheckoutSuccess from "./pages/CheckoutSuccess.tsx";
+import Contact from "./pages/Contact.tsx";
 import Home from "./pages/Home.tsx";
+import LegalNotice from "./pages/LegalNotice.tsx";
 import Login from "./pages/Login.tsx";
+import NotFound from "./pages/NotFound.tsx";
 import Product from "./pages/Product.tsx";
 import ProductDetail from "./pages/ProductDetail.tsx";
 import Register from "./pages/Register.tsx";
+import TermsOfSale from "./pages/TermsOfSale.tsx";
 
 function App() {
   return (
@@ -15,12 +21,20 @@ function App() {
       <Header />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/connexion" element={<Login />} />
+        <Route path="/inscription" element={<Register />} />
+        <Route path="/login" element={<Navigate to="/connexion" replace />} />
+        <Route path="/register" element={<Navigate to="/inscription" replace />} />
         <Route path="/produits" element={<Product />} />
         <Route path="/produits/:id" element={<ProductDetail />} />
-        <Route path="/register" element={<Register />} />
         <Route path="/panier" element={<Cart />} />
         <Route path="/success" element={<CheckoutSuccess />} />
+        <Route path="/compte" element={<Account />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/mentions-legales" element={<LegalNotice />} />
+        <Route path="/cgv" element={<TermsOfSale />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
     </BrowserRouter>

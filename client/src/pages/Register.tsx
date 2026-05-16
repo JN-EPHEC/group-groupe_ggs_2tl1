@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Register() {
 // défition des variables d'état. [variable,fonction]
@@ -29,7 +29,7 @@ function Register() {
     if(!password.match(/[A-Z]/)){wrongPwd +='une majuscule '; }
     if(!password.match(/[a-z]/)){wrongPwd +='une minuscule '; }
     if(!password.match(/[0-9]/)){wrongPwd +='un nombre'; }
-    if(!password.match(/[!@#$%^&*(),.?":{}|<>_\-\\[\]\/+=]/)){wrongPwd +='un caractère spécial '; }
+    if(!password.match(/[!@#$%^&*(),.?":{}|<>_\-\\[\]/+=]/)){wrongPwd +='un caractère spécial '; }
     if (password !== confirmPassword) {setError("Les mots de passe ne correspondent pas.");return;}
     if(wrongPwd.length > 0) {setError(wrongPwd); return}
     try {
@@ -59,7 +59,7 @@ function Register() {
       }
 
       setSuccess("Compte cree avec succes.");
-      setTimeout(() => navigate("/login"), 900);
+      setTimeout(() => navigate("/connexion"), 900);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");
     } 
@@ -225,9 +225,9 @@ function Register() {
 
           <p className="text-center text-[9px] tracking-[2px] uppercase text-gray-400">
             Deja un compte ?{" "}
-            <a href="/login" className="text-black hover:opacity-40">
+            <Link to="/connexion" className="text-black hover:opacity-40">
               Se connecter
-            </a>
+            </Link>
           </p>
         </div>
       </div>
