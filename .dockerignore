@@ -1,0 +1,13 @@
+.git
+.github
+.vscode
+node_modules
+server/node_modules
+client/node_modules
+coverage
+server/coverage
+client/dist
+server/dist
+.env
+.env.*
+npm-debug.log

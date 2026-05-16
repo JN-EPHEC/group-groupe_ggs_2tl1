@@ -1,13 +1,18 @@
 FROM node:18-alpine
 
-WORKDIR /usr/src/app
+WORKDIR /usr/src/app/server
 
-COPY package*.json ./
-COPY  ../prisma ./prisma
-RUN npm install
-RUN npx prisma generate
+COPY server/package*.json ./
+RUN npm ci
 
-COPY . .
+COPY prisma ../prisma
+RUN npx prisma generate --schema=../prisma/schema.prisma
+
+COPY server/tsconfig.json ./
+COPY server/jest.config.js ./
+COPY server/users.htdigest ./
+COPY server/src ./src
+COPY server/public ./public
 
 ENV PORT=3000
 EXPOSE 3000
