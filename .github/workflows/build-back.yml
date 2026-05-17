@@ -43,4 +43,7 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           script: |
             cd ~/GGS
-            #docker stack deploy -c docker-compose.yml ggs --with-registry-auth
+            cat > .env << EOF
+            CORS_ORIGIN=${{secrets.CORS_ORIGIN}}
+            NODE_ENV=production
+            EOF

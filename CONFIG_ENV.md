@@ -30,8 +30,8 @@ JWT_SECRET=your_secret_key_here
 NODE_ENV=production
 DATABASE_URL=postgresql://user:password@host:port/dbname
 PORT=3000
-CORS_ORIGIN=https://yourdomain.com
-VITE_API_URL=https://api.yourdomain.com/api
+CORS_ORIGIN=http://yourdomain.com
+VITE_API_URL=http://api.yourdomain.com/api
 JWT_SECRET=use_a_real_secure_key_here
 ```
 
