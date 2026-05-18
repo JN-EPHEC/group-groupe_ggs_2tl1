@@ -6,8 +6,10 @@ import {
   anonymizeUserAdmin,
   deleteProductAdmin,
   getUserAdmin,
+  listProductsAdmin,
   listUsersAdmin,
   updateProductAdmin,
+  updateProductStockAdmin,
   updateUserAdmin,
 } from "../services/adminServices.js";
 
@@ -40,7 +42,38 @@ const handleAdminError = (error: unknown, res: Response) => {
     return res.status(409).json({ message: "Cet utilisateur est déjà anonymisé" });
   }
 
+  if (error instanceof Error && error.message === "INVALID_STOCK") {
+    return res.status(400).json({ message: "La quantité doit être un entier supérieur ou égal à 0" });
+  }
+
   return null;
+};
+
+export const listProducts = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const sort = typeof req.query.sort === "string" ? req.query.sort : undefined;
+    const products = await listProductsAdmin({ sort });
+
+    return res.status(200).json(products);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const updateProductStock = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const product = await updateProductStockAdmin(
+      Number(req.params.id),
+      req.body.quantite ?? req.body.stock
+    );
+
+    return res.status(200).json(product);
+  } catch (error) {
+    const handled = handleAdminError(error, res);
+    if (handled) return handled;
+
+    return next(error);
+  }
 };
 
 export const createProduct = async (req: Request, res: Response, next: NextFunction) => {

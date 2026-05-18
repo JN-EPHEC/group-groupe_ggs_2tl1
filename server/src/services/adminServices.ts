@@ -74,6 +74,56 @@ export const updateProductAdmin = async (productId: number, input: ProductInput)
   });
 };
 
+type ListProductsInput = {
+  sort?: string;
+};
+
+const productListSelect = {
+  id: true,
+  name: true,
+  stock: true,
+  price: true,
+  isActive: true,
+  category: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+};
+
+export const listProductsAdmin = async (input: ListProductsInput = {}) => {
+  const orderBy =
+    input.sort === "stock_desc"
+      ? { stock: "desc" as const }
+      : { stock: "asc" as const };
+
+  return prisma.products.findMany({
+    select: productListSelect,
+    orderBy,
+  });
+};
+
+export const updateProductStockAdmin = async (productId: number, quantite: unknown) => {
+  const parsed = Number(quantite);
+
+  if (!Number.isInteger(parsed) || parsed < 0) {
+    throw new Error("INVALID_STOCK");
+  }
+
+  const exists = await prisma.products.findUnique({ where: { id: productId } });
+
+  if (!exists) {
+    throw new Error("PRODUCT_NOT_FOUND");
+  }
+
+  return prisma.products.update({
+    where: { id: productId },
+    data: { stock: parsed },
+    select: productListSelect,
+  });
+};
+
 const USERS_PAGE_SIZE = 20;
 
 type ListUsersInput = {

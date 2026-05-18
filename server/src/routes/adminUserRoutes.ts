@@ -20,6 +20,9 @@ router.delete('/users/:id', checkIdParam, adminControllers.deleteAdmin);
 // Crée un user admin
 router.post('/users', checkEmptyBody, adminControllers.createAdmin);
 
+router.get('/products', adminControllers.listProducts);
+router.put('/products/:id/stock', checkIdParam, checkEmptyBody, adminControllers.updateProductStock);
+
 // Ajoute un produit
 router.post('/products', checkEmptyBody, adminControllers.createProduct);
 

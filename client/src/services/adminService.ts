@@ -67,3 +67,23 @@ export function deleteAdminUser(id: number) {
     user: AdminUser;
   }>;
 }
+
+export type AdminProductStock = {
+  id: number;
+  name: string;
+  stock: number;
+  price: number;
+  isActive: boolean;
+  category: { id: number; name: string };
+};
+
+export function fetchAdminProducts(sort = "stock_asc") {
+  return adminFetch(`/products?sort=${encodeURIComponent(sort)}`) as Promise<AdminProductStock[]>;
+}
+
+export function updateAdminProductStock(id: number, quantite: number) {
+  return adminFetch(`/products/${id}/stock`, {
+    method: "PUT",
+    body: JSON.stringify({ quantite }),
+  }) as Promise<AdminProductStock>;
+}
