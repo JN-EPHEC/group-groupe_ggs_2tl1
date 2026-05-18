@@ -2,6 +2,8 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL 
+
 function Register() {
 // défition des variables d'état. [variable,fonction]
   const navigate = useNavigate();
@@ -33,7 +35,7 @@ function Register() {
     if (password !== confirmPassword) {setError("Les mots de passe ne correspondent pas.");return;}
     if(wrongPwd.length > 0) {setError(wrongPwd); return}
     try {
-      const response = await fetch(`api/auth/register`, {
+      const response = await fetch(`${API_URL}api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
