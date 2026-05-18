@@ -74,16 +74,73 @@ export const updateProductAdmin = async (productId: number, input: ProductInput)
   });
 };
 
-export const getAllUsersAdmin = async () => {
-  return prisma.user.findMany({
-    select: userSelect,
-  });
+const USERS_PAGE_SIZE = 20;
+
+type ListUsersInput = {
+  search?: string;
+  page?: number;
+};
+
+const orderInclude = {
+  orderBy: { orderDate: "desc" as const },
+  include: {
+    status: true,
+    orderProducts: {
+      include: {
+        product: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    },
+  },
+};
+
+export const listUsersAdmin = async (input: ListUsersInput = {}) => {
+  const page = Number.isInteger(input.page) && (input.page as number) > 0 ? (input.page as number) : 1;
+  const search = input.search?.trim();
+
+  const where =
+    search && search.length > 0
+      ? {
+          OR: [
+            { username: { contains: search, mode: "insensitive" as const } },
+            { email: { contains: search, mode: "insensitive" as const } },
+          ],
+        }
+      : undefined;
+
+  const [users, total] = await Promise.all([
+    prisma.user.findMany({
+      where,
+      select: userSelect,
+      orderBy: { created_at: "desc" },
+      skip: (page - 1) * USERS_PAGE_SIZE,
+      take: USERS_PAGE_SIZE,
+    }),
+    prisma.user.count({ where }),
+  ]);
+
+  return {
+    users,
+    pagination: {
+      page,
+      pageSize: USERS_PAGE_SIZE,
+      total,
+      totalPages: Math.max(1, Math.ceil(total / USERS_PAGE_SIZE)),
+    },
+  };
 };
 
 export const getUserAdmin = async (userId: number) => {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: userSelect,
+    select: {
+      ...userSelect,
+      orders: orderInclude,
+    },
   });
 
   if (!user) {

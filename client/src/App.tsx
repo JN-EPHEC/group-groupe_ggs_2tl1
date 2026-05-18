@@ -6,6 +6,8 @@ import AdminLayout from "./layouts/AdminLayout.tsx";
 import Account from "./pages/Account.tsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.tsx";
 import AdminSectionPlaceholder from "./pages/admin/AdminSectionPlaceholder.tsx";
+import AdminUserDetail from "./pages/admin/AdminUserDetail.tsx";
+import AdminUserList from "./pages/admin/AdminUserList.tsx";
 import Cart from "./pages/Cart.tsx";
 import CheckoutSuccess from "./pages/CheckoutSuccess.tsx";
 import Contact from "./pages/Contact.tsx";
@@ -63,10 +65,8 @@ function App() {
           }
         >
           <Route index element={<AdminDashboard />} />
-          <Route
-            path="utilisateurs"
-            element={<AdminSectionPlaceholder title="Utilisateurs" />}
-          />
+          <Route path="utilisateurs" element={<AdminUserList />} />
+          <Route path="utilisateurs/:id" element={<AdminUserDetail />} />
           <Route path="stocks" element={<AdminSectionPlaceholder title="Stocks" />} />
           <Route path="commandes" element={<AdminSectionPlaceholder title="Commandes" />} />
           <Route path="categories" element={<AdminSectionPlaceholder title="Catégories" />} />

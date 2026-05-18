@@ -5,8 +5,8 @@ import {
   createProductAdmin,
   deleteAdminUser,
   deleteProductAdmin,
-  getAllUsersAdmin,
   getUserAdmin,
+  listUsersAdmin,
   updateProductAdmin,
   updateUserAdmin,
 } from "../services/adminServices.js";
@@ -71,11 +71,15 @@ export const modifyProduct = async (req: Request, res: Response, next: NextFunct
   }
 };
 
-export const getAllUsers = async (_req: Request, res: Response, next: NextFunction) => {
+export const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const users = await getAllUsersAdmin();
+    const search = typeof req.query.search === "string" ? req.query.search : undefined;
+    const pageParam = typeof req.query.page === "string" ? Number(req.query.page) : 1;
+    const page = Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
 
-    return res.status(200).json(users);
+    const result = await listUsersAdmin({ search, page });
+
+    return res.status(200).json(result);
   } catch (error) {
     return next(error);
   }
