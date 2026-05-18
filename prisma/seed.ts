@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { ORDER_STATUS_NAMES } from "../server/src/constants/orderStatuses.js";
 import prisma from "../server/src/config/prisma";
 
 
@@ -39,12 +40,19 @@ async function main() {
         create: { name: "WRITE" },
     });
 
-    //Table Status
-    const statusPending = await prisma.orderStatus.upsert({
-        where: { name: "En attente" },
-        update: {},
-        create: { name: "En attente" },
-    });
+    // Table OrderStatus
+    const statuses: Record<string, { id: number; name: string }> = {};
+
+    for (const name of ORDER_STATUS_NAMES) {
+        const status = await prisma.orderStatus.upsert({
+            where: { name },
+            update: {},
+            create: { name },
+        });
+        statuses[name] = status;
+    }
+
+    const statusPending = statuses["En attente"];
 
     //Table Categories
     const catPants = await prisma.categories.upsert({

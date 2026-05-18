@@ -71,6 +71,7 @@ model Products {
   price       Float
   stock       Int
   category_id Int
+  isActive    Boolean  @default(true)
 
   category      Categories     @relation(fields: [category_id], references: [id])
   orderProducts OrderProduct[]
