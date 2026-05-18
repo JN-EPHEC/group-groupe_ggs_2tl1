@@ -33,6 +33,7 @@ describe("Auth service", () => {
       prismaMock.$transaction.mockImplementation(async (callback) => {
         return callback(prismaMock);
       });
+      prismaMock.role.findUnique.mockResolvedValue({ id: 2, name: "Client" });
       prismaMock.user.create.mockResolvedValue(user);
       prismaMock.credentials.create.mockResolvedValue({
         id: 1,
@@ -76,10 +77,18 @@ describe("Auth service", () => {
       expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
         where: { email: "greg@test.com" },
       });
+      expect(prismaMock.role.findUnique).toHaveBeenCalledWith({
+        where: { name: "Client" },
+      });
       expect(prismaMock.user.create).toHaveBeenCalledWith({
         data: {
           username: "greg",
           email: "greg@test.com",
+          roles: {
+            create: {
+              role_id: 2,
+            },
+          },
         },
       });
       expect(prismaMock.credentials.create).toHaveBeenCalledWith({
@@ -102,6 +111,22 @@ describe("Auth service", () => {
           password: "password123",
         })
       ).rejects.toThrow("EMAIL_ALREADY_EXISTS");
+    });
+
+    it("rejette si le rôle Client est absent", async () => {
+      prismaMock.user.findUnique.mockResolvedValue(null);
+      prismaMock.$transaction.mockImplementation(async (callback) => {
+        return callback(prismaMock);
+      });
+      prismaMock.role.findUnique.mockResolvedValue(null);
+
+      await expect(
+        registerUser({
+          username: "greg",
+          email: "greg@test.com",
+          password: "password123",
+        })
+      ).rejects.toThrow("CLIENT_ROLE_NOT_FOUND");
     });
   });
 

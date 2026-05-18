@@ -119,7 +119,7 @@ describe("Admin services", () => {
   });
 
   it("crée un utilisateur admin", async () => {
-    prismaMock.role.findUnique.mockResolvedValue({ id: 1, name: "admin" });
+    prismaMock.role.findUnique.mockResolvedValue({ id: 1, name: "Admin" });
     prismaMock.user.create.mockResolvedValue(user as any);
 
     const result = await createAdminUser({
@@ -128,6 +128,9 @@ describe("Admin services", () => {
     });
 
     expect(result).toEqual(user);
+    expect(prismaMock.role.findUnique).toHaveBeenCalledWith({
+      where: { name: "Admin" },
+    });
     expect(prismaMock.user.create).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({

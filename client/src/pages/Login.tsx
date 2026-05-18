@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { setStoredUser, setToken } from "../utils/auth";
+import { flattenRoleNames, setStoredUser, setToken } from "../utils/auth";
 
  export default function Login(){
   const [email,    setEmail]   = useState("")
@@ -61,16 +61,13 @@ const profile = await response.json();
 if (profile && typeof profile === "object") {
   const username = (profile as { username?: unknown; name?: unknown }).username ?? (profile as { name?: unknown }).name;
   const emailValue = (profile as { email?: unknown }).email;
-  const roleValue = (profile as { role?: unknown }).role;
-  const rolesValue = (profile as { roles?: unknown }).roles;
-  const isAdminValue = (profile as { isAdmin?: unknown }).isAdmin;
+  const roleNames = flattenRoleNames((profile as { roles?: unknown }).roles);
 
   setStoredUser({
     username: typeof username === "string" ? username : undefined,
     email: typeof emailValue === "string" ? emailValue : undefined,
-    role: typeof roleValue === "string" ? roleValue : undefined,
-    roles: Array.isArray(rolesValue) || typeof rolesValue === "string" ? (rolesValue as string[] | string) : undefined,
-    isAdmin: isAdminValue === true,
+    roles: roleNames,
+    isAdmin: roleNames.some((name) => name.toLowerCase() === "admin"),
   });
 }
 };

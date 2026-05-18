@@ -1,4 +1,5 @@
 import prisma from "../config/prisma.js";
+import { isAdminRole, ROLE_ADMIN } from "../utils/roles.js";
 
 type ProductInput = {
   name?: string;
@@ -120,7 +121,7 @@ export const updateUserAdmin = async (userId: number, input: UserUpdateInput) =>
 
 export const createAdminUser = async (input: AdminInput) => {
   const adminRole = await prisma.role.findUnique({
-    where: { name: "admin" },
+    where: { name: ROLE_ADMIN },
   });
 
   if (!adminRole) {
@@ -163,7 +164,7 @@ export const deleteAdminUser = async (userId: number) => {
     throw new Error("USER_NOT_FOUND");
   }
 
-  const isAdmin = user.roles.some((userRole) => userRole.role.name.toLowerCase() === "admin");
+  const isAdmin = user.roles.some((userRole) => isAdminRole(userRole.role.name));
   if (!isAdmin) {
     throw new Error("USER_NOT_ADMIN");
   }
