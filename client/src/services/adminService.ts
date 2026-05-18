@@ -60,3 +60,10 @@ export function fetchAdminUsers(search: string, page: number) {
 export function fetchAdminUser(id: number) {
   return adminFetch(`/users/${id}`) as Promise<AdminUserDetail>;
 }
+
+export function deleteAdminUser(id: number) {
+  return adminFetch(`/users/${id}`, { method: "DELETE" }) as Promise<{
+    message: string;
+    user: AdminUser;
+  }>;
+}

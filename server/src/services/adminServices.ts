@@ -1,5 +1,5 @@
 import prisma from "../config/prisma.js";
-import { isAdminRole, ROLE_ADMIN } from "../utils/roles.js";
+import { ROLE_ADMIN } from "../utils/roles.js";
 
 type ProductInput = {
   name?: string;
@@ -198,22 +198,18 @@ export const createAdminUser = async (input: AdminInput) => {
   });
 };
 
-export const deleteAdminUser = async (userId: number) => {
+const ANONYMIZED_EMAIL_SUFFIX = "@anonymized.local";
+
+export const anonymizeUserAdmin = async (targetUserId: number, adminUserId: number) => {
+  if (targetUserId === adminUserId) {
+    throw new Error("CANNOT_DELETE_SELF");
+  }
+
   const user = await prisma.user.findUnique({
-    where: { id: userId },
+    where: { id: targetUserId },
     select: {
       id: true,
-      username: true,
       email: true,
-      roles: {
-        select: {
-          role: {
-            select: {
-              name: true,
-            },
-          },
-        },
-      },
     },
   });
 
@@ -221,21 +217,30 @@ export const deleteAdminUser = async (userId: number) => {
     throw new Error("USER_NOT_FOUND");
   }
 
-  const isAdmin = user.roles.some((userRole) => isAdminRole(userRole.role.name));
-  if (!isAdmin) {
-    throw new Error("USER_NOT_ADMIN");
+  if (user.email.endsWith(ANONYMIZED_EMAIL_SUFFIX)) {
+    throw new Error("USER_ALREADY_ANONYMIZED");
   }
 
-  const deletedUser = await prisma.user.delete({
-    where: { id: userId },
-    select: {
-      id: true,
-      username: true,
-      email: true,
-    },
+  const anonymizedUser = await prisma.$transaction(async (tx) => {
+    await tx.credentials.deleteMany({ where: { user_id: targetUserId } });
+    await tx.address.deleteMany({ where: { user_id: targetUserId } });
+    await tx.userRole.deleteMany({ where: { user_id: targetUserId } });
+
+    return tx.user.update({
+      where: { id: targetUserId },
+      data: {
+        username: `utilisateur_supprime_${targetUserId}`,
+        email: `deleted_${targetUserId}${ANONYMIZED_EMAIL_SUFFIX}`,
+        isActive: false,
+      },
+      select: userSelect,
+    });
   });
 
-  return { message: "Admin supprimé", user: deletedUser };
+  return {
+    message: "Utilisateur anonymisé",
+    user: anonymizedUser,
+  };
 };
 
 export const createCategoryAdmin = async (input: CategoryInput) => {

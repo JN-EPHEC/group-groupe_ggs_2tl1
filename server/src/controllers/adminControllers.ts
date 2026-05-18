@@ -3,7 +3,7 @@ import {
   createAdminUser,
   createCategoryAdmin,
   createProductAdmin,
-  deleteAdminUser,
+  anonymizeUserAdmin,
   deleteProductAdmin,
   getUserAdmin,
   listUsersAdmin,
@@ -30,6 +30,14 @@ const handleAdminError = (error: unknown, res: Response) => {
 
   if (error instanceof Error && error.message === "USER_NOT_ADMIN") {
     return res.status(403).json({ message: "Cet utilisateur n'est pas un admin" });
+  }
+
+  if (error instanceof Error && error.message === "CANNOT_DELETE_SELF") {
+    return res.status(403).json({ message: "Vous ne pouvez pas supprimer votre propre compte" });
+  }
+
+  if (error instanceof Error && error.message === "USER_ALREADY_ANONYMIZED") {
+    return res.status(409).json({ message: "Cet utilisateur est déjà anonymisé" });
   }
 
   return null;
@@ -126,9 +134,10 @@ export const createAdmin = async (req: Request, res: Response, next: NextFunctio
 
 export const deleteAdmin = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const deletedUser = await deleteAdminUser(Number(req.params.id));
+    const adminUserId = Number(req.user?.id);
+    const result = await anonymizeUserAdmin(Number(req.params.id), adminUserId);
 
-    return res.status(200).json(deletedUser);
+    return res.status(200).json(result);
   } catch (error) {
     const handled = handleAdminError(error, res);
     if (handled) return handled;

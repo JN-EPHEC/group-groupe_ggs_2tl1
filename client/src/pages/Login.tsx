@@ -59,11 +59,13 @@ if (!response.ok) {
 }
 const profile = await response.json();
 if (profile && typeof profile === "object") {
+  const idValue = (profile as { id?: unknown }).id;
   const username = (profile as { username?: unknown; name?: unknown }).username ?? (profile as { name?: unknown }).name;
   const emailValue = (profile as { email?: unknown }).email;
   const roleNames = flattenRoleNames((profile as { roles?: unknown }).roles);
 
   setStoredUser({
+    id: typeof idValue === "number" ? idValue : undefined,
     username: typeof username === "string" ? username : undefined,
     email: typeof emailValue === "string" ? emailValue : undefined,
     roles: roleNames,

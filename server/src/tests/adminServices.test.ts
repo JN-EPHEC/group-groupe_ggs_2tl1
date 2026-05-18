@@ -3,7 +3,6 @@ import {
   createAdminUser,
   createCategoryAdmin,
   createProductAdmin,
-  deleteAdminUser,
   deleteProductAdmin,
   getUserAdmin,
   updateUserAdmin,
@@ -152,28 +151,6 @@ describe("Admin services", () => {
     await expect(createAdminUser({ username: "admin", email: "admin@test.com" })).rejects.toThrow(
       "ADMIN_ROLE_NOT_FOUND"
     );
-  });
-
-  it("supprime un utilisateur admin", async () => {
-    const deletedUser = { id: 1, username: "admin", email: "admin@test.com" };
-    prismaMock.user.findUnique.mockResolvedValue(user as any);
-    prismaMock.user.delete.mockResolvedValue(deletedUser as any);
-
-    const result = await deleteAdminUser(1);
-
-    expect(result).toEqual({
-      message: "Admin supprimé",
-      user: deletedUser,
-    });
-  });
-
-  it("rejette la suppression si l'utilisateur n'est pas admin", async () => {
-    prismaMock.user.findUnique.mockResolvedValue({
-      ...user,
-      roles: [{ role: { name: "Client" } }],
-    } as any);
-
-    await expect(deleteAdminUser(1)).rejects.toThrow("USER_NOT_ADMIN");
   });
 
   it("crée une catégorie", async () => {
