@@ -1,7 +1,6 @@
 import { describe, expect, it } from "@jest/globals";
 import {
   createAdminUser,
-  createCategoryAdmin,
   createProductAdmin,
   getUserAdmin,
   updateUserAdmin,
@@ -134,15 +133,4 @@ describe("Admin services", () => {
     );
   });
 
-  it("crée une catégorie", async () => {
-    const category = { id: 1, name: "Catégorie test" };
-    prismaMock.categories.create.mockResolvedValue(category);
-
-    const result = await createCategoryAdmin({ name: "Catégorie test" });
-
-    expect(result).toEqual(category);
-    expect(prismaMock.categories.create).toHaveBeenCalledWith({
-      data: { name: "Catégorie test" },
-    });
-  });
 });

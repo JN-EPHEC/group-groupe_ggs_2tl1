@@ -5,7 +5,8 @@ import ProtectedRoute from "./components/ProtectedRoute.tsx";
 import AdminLayout from "./layouts/AdminLayout.tsx";
 import Account from "./pages/Account.tsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.tsx";
-import AdminSectionPlaceholder from "./pages/admin/AdminSectionPlaceholder.tsx";
+import AdminCategories from "./pages/admin/AdminCategories.tsx";
+import AdminOrders from "./pages/admin/AdminOrders.tsx";
 import AdminProductForm from "./pages/admin/AdminProductForm.tsx";
 import AdminStockList from "./pages/admin/AdminStockList.tsx";
 import AdminUserDetail from "./pages/admin/AdminUserDetail.tsx";
@@ -71,8 +72,8 @@ function App() {
           <Route path="utilisateurs/:id" element={<AdminUserDetail />} />
           <Route path="stocks" element={<AdminStockList />} />
           <Route path="produits/:id" element={<AdminProductForm />} />
-          <Route path="commandes" element={<AdminSectionPlaceholder title="Commandes" />} />
-          <Route path="categories" element={<AdminSectionPlaceholder title="Catégories" />} />
+          <Route path="commandes" element={<AdminOrders />} />
+          <Route path="categories" element={<AdminCategories />} />
         </Route>
         <Route path="/mentions-legales" element={<LegalNotice />} />
         <Route path="/cgv" element={<TermsOfSale />} />

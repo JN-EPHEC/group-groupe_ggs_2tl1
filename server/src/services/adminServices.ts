@@ -21,10 +21,6 @@ type AdminInput = {
   [key: string]: unknown;
 };
 
-type CategoryInput = {
-  name: string;
-};
-
 const userSelect = {
   id: true,
   username: true,
@@ -404,8 +400,3 @@ export const anonymizeUserAdmin = async (targetUserId: number, adminUserId: numb
   };
 };
 
-export const createCategoryAdmin = async (input: CategoryInput) => {
-  return prisma.categories.create({
-    data: input,
-  });
-};

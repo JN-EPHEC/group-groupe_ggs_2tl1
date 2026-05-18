@@ -139,3 +139,67 @@ export async function fetchCategories() {
   }
   return data as CategoryOption[];
 }
+
+export type AdminCategory = {
+  id: number;
+  name: string;
+  _count: { products: number };
+};
+
+export function fetchAdminCategories() {
+  return adminFetch("/categories") as Promise<AdminCategory[]>;
+}
+
+export function createAdminCategory(name: string) {
+  return adminFetch("/categories", {
+    method: "POST",
+    body: JSON.stringify({ name }),
+  }) as Promise<AdminCategory>;
+}
+
+export function updateAdminCategory(id: number, name: string) {
+  return adminFetch(`/categories/${id}`, {
+    method: "PUT",
+    body: JSON.stringify({ name }),
+  }) as Promise<AdminCategory>;
+}
+
+export function deleteAdminCategory(id: number) {
+  return adminFetch(`/categories/${id}`, { method: "DELETE" }) as Promise<AdminCategory>;
+}
+
+export const ORDER_STATUS_OPTIONS = [
+  "En attente",
+  "Validée",
+  "Expédiée",
+  "Livrée",
+  "Annulée",
+] as const;
+
+export type AdminOrder = {
+  id: number;
+  orderDate: string;
+  status: { id: number; name: string };
+  user: { id: number; username: string; email: string };
+  orderProducts: Array<{
+    quantity: number;
+    product: { id: number; name: string };
+  }>;
+  statusHistory: Array<{
+    id: number;
+    from_status: string | null;
+    to_status: string;
+    changed_at: string;
+  }>;
+};
+
+export function fetchAdminOrders() {
+  return adminFetch("/orders") as Promise<AdminOrder[]>;
+}
+
+export function updateAdminOrderStatus(id: number, statut: string) {
+  return adminFetch(`/orders/${id}/status`, {
+    method: "PUT",
+    body: JSON.stringify({ statut }),
+  }) as Promise<AdminOrder>;
+}

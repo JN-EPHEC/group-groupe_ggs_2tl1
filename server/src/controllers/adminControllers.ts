@@ -1,7 +1,13 @@
 import type { Request, Response, NextFunction } from "express";
 import {
-  createAdminUser,
   createCategoryAdmin,
+  deleteCategoryAdmin,
+  getAllCategoriesAdmin,
+  updateCategoryAdmin,
+} from "../services/adminCategoryServices.js";
+import { getAllOrdersAdmin, updateOrderStatusAdmin } from "../services/adminOrderServices.js";
+import {
+  createAdminUser,
   createProductAdmin,
   anonymizeUserAdmin,
   deleteProductAdmin,
@@ -69,6 +75,38 @@ const handleAdminError = (error: unknown, res: Response) => {
 
   if (error instanceof Error && error.message === "NO_PRODUCT_DATA") {
     return res.status(400).json({ message: "Aucune donnée de produit à modifier" });
+  }
+
+  if (error instanceof Error && error.message === "INVALID_CATEGORY_NAME") {
+    return res.status(400).json({ message: "Nom de catégorie invalide" });
+  }
+
+  if (error instanceof Error && error.message === "CATEGORY_NAME_EXISTS") {
+    return res.status(409).json({ message: "Ce nom de catégorie existe déjà" });
+  }
+
+  if (error instanceof Error && error.message === "CATEGORY_HAS_PRODUCTS") {
+    return res.status(409).json({ message: "Impossible de supprimer une catégorie liée à des produits" });
+  }
+
+  if (error instanceof Error && error.message === "CATEGORY_NOT_FOUND") {
+    return res.status(404).json({ message: "Catégorie introuvable" });
+  }
+
+  if (error instanceof Error && error.message === "ORDER_NOT_FOUND") {
+    return res.status(404).json({ message: "Commande introuvable" });
+  }
+
+  if (error instanceof Error && error.message === "INVALID_ORDER_STATUS") {
+    return res.status(400).json({ message: "Statut de commande invalide" });
+  }
+
+  if (error instanceof Error && error.message === "INVALID_STATUS_TRANSITION") {
+    return res.status(400).json({ message: "Transition de statut non autorisée" });
+  }
+
+  if (error instanceof Error && error.message === "STATUS_NOT_FOUND") {
+    return res.status(500).json({ message: "Statut introuvable en base" });
   }
 
   return null;
@@ -215,12 +253,64 @@ export const deleteAdmin = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
+export const getAllCategories = async (_req: Request, res: Response, next: NextFunction) => {
+  try {
+    const categories = await getAllCategoriesAdmin();
+    return res.status(200).json(categories);
+  } catch (error) {
+    return next(error);
+  }
+};
+
 export const createCat = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const category = await createCategoryAdmin(req.body);
-
     return res.status(201).json(category);
   } catch (error) {
+    const handled = handleAdminError(error, res);
+    if (handled) return handled;
+    return next(error);
+  }
+};
+
+export const updateCat = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const category = await updateCategoryAdmin(Number(req.params.id), req.body);
+    return res.status(200).json(category);
+  } catch (error) {
+    const handled = handleAdminError(error, res);
+    if (handled) return handled;
+    return next(error);
+  }
+};
+
+export const deleteCat = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const category = await deleteCategoryAdmin(Number(req.params.id));
+    return res.status(200).json(category);
+  } catch (error) {
+    const handled = handleAdminError(error, res);
+    if (handled) return handled;
+    return next(error);
+  }
+};
+
+export const getAllOrders = async (_req: Request, res: Response, next: NextFunction) => {
+  try {
+    const orders = await getAllOrdersAdmin();
+    return res.status(200).json(orders);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const updateOrderStatus = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const order = await updateOrderStatusAdmin(Number(req.params.id), req.body);
+    return res.status(200).json(order);
+  } catch (error) {
+    const handled = handleAdminError(error, res);
+    if (handled) return handled;
     return next(error);
   }
 };

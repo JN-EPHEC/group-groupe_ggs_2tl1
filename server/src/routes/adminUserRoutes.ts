@@ -33,8 +33,12 @@ router.patch('/products/:id', checkIdParam, checkEmptyBody, adminControllers.mod
 // Supprime un produit
 router.delete('/products/:id', checkIdParam, adminControllers.deleteProduct);
 
-// Ajoute une catégorie
+router.get('/categories', adminControllers.getAllCategories);
 router.post('/categories', checkEmptyBody, adminControllers.createCat);
+router.put('/categories/:id', checkIdParam, checkEmptyBody, adminControllers.updateCat);
+router.delete('/categories/:id', checkIdParam, adminControllers.deleteCat);
 
+router.get('/orders', adminControllers.getAllOrders);
+router.put('/orders/:id/status', checkIdParam, checkEmptyBody, adminControllers.updateOrderStatus);
 
 export default router;
