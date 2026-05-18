@@ -21,6 +21,7 @@ router.delete('/users/:id', checkIdParam, adminControllers.deleteAdmin);
 router.post('/users', checkEmptyBody, adminControllers.createAdmin);
 
 router.get('/products', adminControllers.listProducts);
+router.get('/products/:id', checkIdParam, adminControllers.getProduct);
 router.put('/products/:id/stock', checkIdParam, checkEmptyBody, adminControllers.updateProductStock);
 
 // Ajoute un produit

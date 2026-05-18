@@ -49,16 +49,83 @@ export const createProductAdmin = async (input: ProductInput) => {
   });
 };
 
-export const deleteProductAdmin = async (productId: number) => {
-  const exists = await prisma.products.findUnique({ where: { id: productId } });
+const productAdminDetailSelect = {
+  id: true,
+  name: true,
+  description: true,
+  price: true,
+  stock: true,
+  category_id: true,
+  isActive: true,
+  category: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+};
 
-  if (!exists) {
+export const parseProductUpdateInput = (input: ProductInput) => {
+  const data: ProductInput = {};
+
+  if (input.name !== undefined) {
+    const name = String(input.name).trim();
+    if (!name || name.length > 255) {
+      throw new Error("INVALID_PRODUCT_NAME");
+    }
+    data.name = name;
+  }
+
+  if (input.description !== undefined) {
+    const description = String(input.description).trim();
+    if (description.length > 2000) {
+      throw new Error("INVALID_PRODUCT_DESCRIPTION");
+    }
+    data.description = description;
+  }
+
+  if (input.price !== undefined) {
+    const price = Number(input.price);
+    if (!Number.isFinite(price) || price < 0) {
+      throw new Error("INVALID_PRODUCT_PRICE");
+    }
+    data.price = price;
+  }
+
+  if (input.stock !== undefined) {
+    const stock = Number(input.stock);
+    if (!Number.isInteger(stock) || stock < 0) {
+      throw new Error("INVALID_STOCK");
+    }
+    data.stock = stock;
+  }
+
+  if (input.category_id !== undefined) {
+    const categoryId = Number(input.category_id);
+    if (!Number.isInteger(categoryId) || categoryId <= 0) {
+      throw new Error("INVALID_PRODUCT_CATEGORY");
+    }
+    data.category_id = categoryId;
+  }
+
+  if (Object.keys(data).length === 0) {
+    throw new Error("NO_PRODUCT_DATA");
+  }
+
+  return data;
+};
+
+export const getProductAdmin = async (productId: number) => {
+  const product = await prisma.products.findUnique({
+    where: { id: productId },
+    select: productAdminDetailSelect,
+  });
+
+  if (!product) {
     throw new Error("PRODUCT_NOT_FOUND");
   }
 
-  return prisma.products.delete({
-    where: { id: productId },
-  });
+  return product;
 };
 
 export const updateProductAdmin = async (productId: number, input: ProductInput) => {
@@ -68,10 +135,54 @@ export const updateProductAdmin = async (productId: number, input: ProductInput)
     throw new Error("PRODUCT_NOT_FOUND");
   }
 
+  const data = parseProductUpdateInput(input);
+
+  if (data.category_id !== undefined) {
+    const category = await prisma.categories.findUnique({
+      where: { id: data.category_id },
+    });
+    if (!category) {
+      throw new Error("CATEGORY_NOT_FOUND");
+    }
+  }
+
   return prisma.products.update({
     where: { id: productId },
-    data: input,
+    data,
+    select: productAdminDetailSelect,
   });
+};
+
+export const deleteProductAdmin = async (productId: number) => {
+  const product = await prisma.products.findUnique({
+    where: { id: productId },
+    include: {
+      _count: {
+        select: { orderProducts: true },
+      },
+    },
+  });
+
+  if (!product) {
+    throw new Error("PRODUCT_NOT_FOUND");
+  }
+
+  if (product._count.orderProducts > 0) {
+    const deactivated = await prisma.products.update({
+      where: { id: productId },
+      data: { isActive: false },
+      select: productAdminDetailSelect,
+    });
+
+    return { mode: "soft" as const, product: deactivated };
+  }
+
+  const deleted = await prisma.products.delete({
+    where: { id: productId },
+    select: productAdminDetailSelect,
+  });
+
+  return { mode: "hard" as const, product: deleted };
 };
 
 type ListProductsInput = {

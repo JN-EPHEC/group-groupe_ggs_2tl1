@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import {
   fetchAdminProducts,
   updateAdminProductStock,
@@ -18,6 +19,12 @@ function stockStatus(stock: number) {
 }
 
 export default function AdminStockList() {
+  const location = useLocation();
+  const flashMessage =
+    location.state && typeof location.state === "object" && "message" in location.state
+      ? String((location.state as { message: unknown }).message)
+      : "";
+
   const [products, setProducts] = useState<AdminProductStock[]>([]);
   const [drafts, setDrafts] = useState<Record<number, string>>({});
   const [error, setError] = useState("");
@@ -78,6 +85,7 @@ export default function AdminStockList() {
       </p>
 
       {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
+      {flashMessage && <p className="text-green-700 text-sm mb-4">{flashMessage}</p>}
       {message && <p className="text-green-700 text-sm mb-4">{message}</p>}
 
       {loading ? (
@@ -122,14 +130,22 @@ export default function AdminStockList() {
                       />
                     </td>
                     <td className="py-3">
-                      <button
-                        type="button"
-                        disabled={savingId === product.id}
-                        onClick={() => void saveStock(product.id)}
-                        className="text-[10px] tracking-[1px] uppercase underline disabled:opacity-40"
-                      >
-                        {savingId === product.id ? "Enregistrement…" : "Enregistrer"}
-                      </button>
+                      <div className="flex flex-col gap-1">
+                        <button
+                          type="button"
+                          disabled={savingId === product.id}
+                          onClick={() => void saveStock(product.id)}
+                          className="text-[10px] tracking-[1px] uppercase underline disabled:opacity-40 text-left"
+                        >
+                          {savingId === product.id ? "Enregistrement…" : "Enregistrer"}
+                        </button>
+                        <Link
+                          to={`/admin/produits/${product.id}`}
+                          className="text-[10px] tracking-[1px] uppercase underline text-left"
+                        >
+                          Modifier
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 );

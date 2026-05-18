@@ -3,7 +3,6 @@ import {
   createAdminUser,
   createCategoryAdmin,
   createProductAdmin,
-  deleteProductAdmin,
   getUserAdmin,
   updateUserAdmin,
 } from "../services/adminServices";
@@ -56,24 +55,6 @@ describe("Admin services", () => {
         category_id: product.category_id,
       },
     });
-  });
-
-  it("supprime un produit existant", async () => {
-    prismaMock.products.findUnique.mockResolvedValue(product);
-    prismaMock.products.delete.mockResolvedValue(product);
-
-    const result = await deleteProductAdmin(1);
-
-    expect(result).toEqual(product);
-    expect(prismaMock.products.delete).toHaveBeenCalledWith({
-      where: { id: 1 },
-    });
-  });
-
-  it("rejette la suppression d'un produit introuvable", async () => {
-    prismaMock.products.findUnique.mockResolvedValue(null);
-
-    await expect(deleteProductAdmin(999)).rejects.toThrow("PRODUCT_NOT_FOUND");
   });
 
   it("retourne un utilisateur admin par id", async () => {

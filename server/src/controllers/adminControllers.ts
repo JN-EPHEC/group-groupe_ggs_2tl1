@@ -5,6 +5,7 @@ import {
   createProductAdmin,
   anonymizeUserAdmin,
   deleteProductAdmin,
+  getProductAdmin,
   getUserAdmin,
   listProductsAdmin,
   listUsersAdmin,
@@ -46,7 +47,42 @@ const handleAdminError = (error: unknown, res: Response) => {
     return res.status(400).json({ message: "La quantité doit être un entier supérieur ou égal à 0" });
   }
 
+  if (error instanceof Error && error.message === "INVALID_PRODUCT_NAME") {
+    return res.status(400).json({ message: "Nom de produit invalide" });
+  }
+
+  if (error instanceof Error && error.message === "INVALID_PRODUCT_DESCRIPTION") {
+    return res.status(400).json({ message: "Description trop longue (max 2000 caractères)" });
+  }
+
+  if (error instanceof Error && error.message === "INVALID_PRODUCT_PRICE") {
+    return res.status(400).json({ message: "Prix invalide" });
+  }
+
+  if (error instanceof Error && error.message === "INVALID_PRODUCT_CATEGORY") {
+    return res.status(400).json({ message: "Catégorie invalide" });
+  }
+
+  if (error instanceof Error && error.message === "CATEGORY_NOT_FOUND") {
+    return res.status(404).json({ message: "Catégorie introuvable" });
+  }
+
+  if (error instanceof Error && error.message === "NO_PRODUCT_DATA") {
+    return res.status(400).json({ message: "Aucune donnée de produit à modifier" });
+  }
+
   return null;
+};
+
+export const getProduct = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const product = await getProductAdmin(Number(req.params.id));
+    return res.status(200).json(product);
+  } catch (error) {
+    const handled = handleAdminError(error, res);
+    if (handled) return handled;
+    return next(error);
+  }
 };
 
 export const listProducts = async (req: Request, res: Response, next: NextFunction) => {

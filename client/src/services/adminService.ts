@@ -87,3 +87,55 @@ export function updateAdminProductStock(id: number, quantite: number) {
     body: JSON.stringify({ quantite }),
   }) as Promise<AdminProductStock>;
 }
+
+export type AdminProductDetail = {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  category_id: number;
+  isActive: boolean;
+  category: { id: number; name: string };
+};
+
+export type CategoryOption = {
+  id: number;
+  name: string;
+};
+
+export function fetchAdminProduct(id: number) {
+  return adminFetch(`/products/${id}`) as Promise<AdminProductDetail>;
+}
+
+export function updateAdminProduct(
+  id: number,
+  payload: {
+    name: string;
+    description: string;
+    price: number;
+    stock: number;
+    category_id: number;
+  }
+) {
+  return adminFetch(`/products/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  }) as Promise<AdminProductDetail>;
+}
+
+export function deleteAdminProduct(id: number) {
+  return adminFetch(`/products/${id}`, { method: "DELETE" }) as Promise<{
+    mode: "soft" | "hard";
+    product: AdminProductDetail;
+  }>;
+}
+
+export async function fetchCategories() {
+  const response = await fetch("/api/categories");
+  const data = await response.json().catch(() => []);
+  if (!response.ok) {
+    throw new Error("Impossible de charger les catégories");
+  }
+  return data as CategoryOption[];
+}
