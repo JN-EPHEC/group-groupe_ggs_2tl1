@@ -1,6 +1,6 @@
 import express from 'express';
 import * as orderControllers from '../controllers/orderControllers'
-import checkIdParam from '../middlewares/checkIdParam';
+import checkIdParam from '../middlewares/checkIdParam.js';
 import validateOrderBody from '../middlewares/validateOrderBody.js';
 
 

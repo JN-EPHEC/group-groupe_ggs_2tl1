@@ -1,9 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import {useNavigate} from 'react-router-dom'
-
-
-const API_URL = import.meta.env.VITE_API_URL
+import { Link, useNavigate } from "react-router-dom";
+import { setStoredUser, setToken } from "../utils/auth";
 
  export default function Login(){
   const [email,    setEmail]   = useState("")
@@ -17,7 +15,7 @@ const API_URL = import.meta.env.VITE_API_URL
     setError("");
     setSuccess(true);
     try{
-      const response = await fetch(`${API_URL}/api/auth/login`, {
+      const response = await fetch(`/api/auth/login`, {
         method: "POST",
         headers : {"Content-Type": "application/json"},
         body : JSON.stringify({
@@ -31,9 +29,9 @@ const API_URL = import.meta.env.VITE_API_URL
         if(!response.ok){
           throw new Error( 'Identifiants incorects')
         }
-        localStorage.setItem("token", data.token)  
+        setToken(data.token);
         console.log(data.token)  
-      await fetchProfile() 
+      await fetchProfile();
       navigate("/")  
 
       } catch (err) {
@@ -46,7 +44,7 @@ const API_URL = import.meta.env.VITE_API_URL
 const fetchProfile = async () => {
 const token = localStorage.getItem('token');
 
-const response = await fetch(`${API_URL}/api/users/me`, {
+const response = await fetch(`/api/users/me`, {
 headers: {
 'Authorization': `Bearer ${token}`
 }
@@ -54,6 +52,26 @@ headers: {
 if (response.status === 401) {
 // Le token a expire ! Il faudrait appeler la route /refresh ici.
 console.log("Token expire, veuillez vous reconnecter.");
+return;
+}
+if (!response.ok) {
+  return;
+}
+const profile = await response.json();
+if (profile && typeof profile === "object") {
+  const username = (profile as { username?: unknown; name?: unknown }).username ?? (profile as { name?: unknown }).name;
+  const emailValue = (profile as { email?: unknown }).email;
+  const roleValue = (profile as { role?: unknown }).role;
+  const rolesValue = (profile as { roles?: unknown }).roles;
+  const isAdminValue = (profile as { isAdmin?: unknown }).isAdmin;
+
+  setStoredUser({
+    username: typeof username === "string" ? username : undefined,
+    email: typeof emailValue === "string" ? emailValue : undefined,
+    role: typeof roleValue === "string" ? roleValue : undefined,
+    roles: Array.isArray(rolesValue) || typeof rolesValue === "string" ? (rolesValue as string[] | string) : undefined,
+    isAdmin: isAdminValue === true,
+  });
 }
 };
   
@@ -117,8 +135,10 @@ console.log("Token expire, veuillez vous reconnecter.");
            </form>
             <p className="text-center text-[9px] tracking-[2px] uppercase text-gray-400">
             Pas encore de compte ?
-            <a href='/register'> Cliquez ici
-            </a>
+            <Link to="/inscription" className="text-black hover:opacity-40">
+              {" "}
+              Cliquez ici
+            </Link>
             </p>
         </div>
       </div>
@@ -126,6 +146,5 @@ console.log("Token expire, veuillez vous reconnecter.");
       </> 
     )
   }
-
 
 
