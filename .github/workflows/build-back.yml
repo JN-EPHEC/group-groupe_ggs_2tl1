@@ -29,4 +29,6 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           script: |
             cd ~/GGS
-            #docker stack deploy -c docker-compose.yml ggs --with-registry-auth
+            docker compose pull
+            STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY}}
+            docker compose up 
