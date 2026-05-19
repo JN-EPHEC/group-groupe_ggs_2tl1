@@ -2,9 +2,9 @@ FROM node:18-alpine
 
 WORKDIR /usr/src/app
 
-COPY server/package*.json ./
+COPY package*.json ./
+COPY ../prisma ./prisma
 RUN npm install
-COPY prisma ./prisma
 
 RUN npx prisma generate --schema=./prisma/schema.prisma
 
