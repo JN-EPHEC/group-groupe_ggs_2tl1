@@ -28,5 +28,4 @@ jobs:
           script: |
             cd ~/GGS
             docker compose pull
-            STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY}}
-            docker compose up 
+            STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY}} docker compose up -d --force-recreate 
