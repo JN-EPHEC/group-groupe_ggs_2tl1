@@ -20,7 +20,7 @@ jobs:
           npm run build
         working-directory: ./client
         env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}  # ← bug ici aussi, manquait les {{ }}
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
 
       - name: Clean old files on VPS
         uses: appleboy/ssh-action@v1.0.0
@@ -29,7 +29,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
-          script: rm -rf ~/GGS/nginx/www/*   # ← vide le dossier avant
+          script: rm -rf ~/GGS/nginx/www/* 
 
       - name: Deploy to VPS via SCP
         uses: appleboy/scp-action@v0.1.4
