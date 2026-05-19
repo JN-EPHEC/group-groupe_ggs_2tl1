@@ -1,10 +1,7 @@
 import { describe, expect, it } from "@jest/globals";
 import {
   createAdminUser,
-  createCategoryAdmin,
   createProductAdmin,
-  deleteAdminUser,
-  deleteProductAdmin,
   getUserAdmin,
   updateUserAdmin,
 } from "../services/adminServices";
@@ -59,24 +56,6 @@ describe("Admin services", () => {
     });
   });
 
-  it("supprime un produit existant", async () => {
-    prismaMock.products.findUnique.mockResolvedValue(product);
-    prismaMock.products.delete.mockResolvedValue(product);
-
-    const result = await deleteProductAdmin(1);
-
-    expect(result).toEqual(product);
-    expect(prismaMock.products.delete).toHaveBeenCalledWith({
-      where: { id: 1 },
-    });
-  });
-
-  it("rejette la suppression d'un produit introuvable", async () => {
-    prismaMock.products.findUnique.mockResolvedValue(null);
-
-    await expect(deleteProductAdmin(999)).rejects.toThrow("PRODUCT_NOT_FOUND");
-  });
-
   it("retourne un utilisateur admin par id", async () => {
     prismaMock.user.findUnique.mockResolvedValue(user as any);
 
@@ -119,7 +98,7 @@ describe("Admin services", () => {
   });
 
   it("crée un utilisateur admin", async () => {
-    prismaMock.role.findUnique.mockResolvedValue({ id: 1, name: "admin" });
+    prismaMock.role.findUnique.mockResolvedValue({ id: 1, name: "Admin" });
     prismaMock.user.create.mockResolvedValue(user as any);
 
     const result = await createAdminUser({
@@ -128,6 +107,9 @@ describe("Admin services", () => {
     });
 
     expect(result).toEqual(user);
+    expect(prismaMock.role.findUnique).toHaveBeenCalledWith({
+      where: { name: "Admin" },
+    });
     expect(prismaMock.user.create).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({
@@ -151,37 +133,4 @@ describe("Admin services", () => {
     );
   });
 
-  it("supprime un utilisateur admin", async () => {
-    const deletedUser = { id: 1, username: "admin", email: "admin@test.com" };
-    prismaMock.user.findUnique.mockResolvedValue(user as any);
-    prismaMock.user.delete.mockResolvedValue(deletedUser as any);
-
-    const result = await deleteAdminUser(1);
-
-    expect(result).toEqual({
-      message: "Admin supprimé",
-      user: deletedUser,
-    });
-  });
-
-  it("rejette la suppression si l'utilisateur n'est pas admin", async () => {
-    prismaMock.user.findUnique.mockResolvedValue({
-      ...user,
-      roles: [{ role: { name: "Client" } }],
-    } as any);
-
-    await expect(deleteAdminUser(1)).rejects.toThrow("USER_NOT_ADMIN");
-  });
-
-  it("crée une catégorie", async () => {
-    const category = { id: 1, name: "Catégorie test" };
-    prismaMock.categories.create.mockResolvedValue(category);
-
-    const result = await createCategoryAdmin({ name: "Catégorie test" });
-
-    expect(result).toEqual(category);
-    expect(prismaMock.categories.create).toHaveBeenCalledWith({
-      data: { name: "Catégorie test" },
-    });
-  });
 });

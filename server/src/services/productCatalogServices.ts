@@ -69,7 +69,9 @@ export const getProductsCatalog = async (query: ProductQueryInput) => {
     throw new Error("SORT_INVALID");
   }
 
-  const where: Prisma.ProductsWhereInput = {};
+  const where: Prisma.ProductsWhereInput = {
+    isActive: true,
+  };
 
   if (categoryId > 0) {
     where.category_id = categoryId;
@@ -128,7 +130,7 @@ export const getCatalogProductById = async (id: number) => {
     },
   });
 
-  if (!product) {
+  if (!product || !product.isActive) {
     throw new Error("PRODUCT_NOT_FOUND");
   }
 

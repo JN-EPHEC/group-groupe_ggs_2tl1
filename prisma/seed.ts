@@ -1,6 +1,76 @@
 import "dotenv/config";
+import { ORDER_STATUS_NAMES } from "../server/src/constants/orderStatuses.js";
 import prisma from "../server/src/config/prisma";
 
+async function upsertUserRole(userId: number, roleId: number) {
+    await prisma.userRole.upsert({
+        where: {
+            user_id_role_id: {
+                user_id: userId,
+                role_id: roleId,
+            },
+        },
+        update: {},
+        create: {
+            user_id: userId,
+            role_id: roleId,
+        },
+    });
+}
+
+async function upsertRolePermission(roleId: number, permissionId: number) {
+    await prisma.rolePermission.upsert({
+        where: {
+            role_id_permission_id: {
+                role_id: roleId,
+                permission_id: permissionId,
+            },
+        },
+        update: {},
+        create: {
+            role_id: roleId,
+            permission_id: permissionId,
+        },
+    });
+}
+
+async function ensureProduct(data: {
+    name: string;
+    description: string;
+    price: number;
+    stock: number;
+    category_id: number;
+}) {
+    const existing = await prisma.products.findFirst({
+        where: { name: data.name },
+    });
+
+    if (existing) {
+        return existing;
+    }
+
+    return prisma.products.create({ data });
+}
+
+async function ensureOrderProduct(data: {
+    order_id: number;
+    product_id: number;
+    quantity: number;
+    priceAtPurchase: number;
+}) {
+    const existing = await prisma.orderProduct.findFirst({
+        where: {
+            order_id: data.order_id,
+            product_id: data.product_id,
+        },
+    });
+
+    if (existing) {
+        return existing;
+    }
+
+    return prisma.orderProduct.create({ data });
+}
 
 async function main() {
     // Table Role
@@ -39,12 +109,19 @@ async function main() {
         create: { name: "WRITE" },
     });
 
-    //Table Status
-    const statusPending = await prisma.orderStatus.upsert({
-        where: { name: "En attente" },
-        update: {},
-        create: { name: "En attente" },
-    });
+    // Table OrderStatus
+    const statuses: Record<string, { id: number; name: string }> = {};
+
+    for (const name of ORDER_STATUS_NAMES) {
+        const status = await prisma.orderStatus.upsert({
+            where: { name },
+            update: {},
+            create: { name },
+        });
+        statuses[name] = status;
+    }
+
+    const statusPending = statuses["En attente"];
 
     //Table Categories
     const catPants = await prisma.categories.upsert({
@@ -64,40 +141,28 @@ async function main() {
     });
 
     //Table des produits
-        const prodJeans = await prisma.products.create({
-        data: {
+    const prodJeans = await ensureProduct({
         name: "Jeans",
         description: "Blue jeans",
         price: 50,
         stock: 20,
-        category: {
-          connect: { id: catPants.id }
-        }
-      }
+        category_id: catPants.id,
     });
 
-    const prodTshirt = await prisma.products.create({
-      data: {
+    const prodTshirt = await ensureProduct({
         name: "T-Shirt",
         description: "Basic white t-shirt",
         price: 20,
         stock: 50,
-        category: {
-          connect: { id: catShirt.id }
-        }
-      }
+        category_id: catShirt.id,
     });
 
-    const prodJacket = await prisma.products.create({
-      data: {
+    const prodJacket = await ensureProduct({
         name: "Jacket",
         description: "Winter jacket",
         price: 100,
         stock: 10,
-        category: {
-          connect: { id: catTop.id }
-        }
-      }
+        category_id: catTop.id,
     });
     
 
@@ -173,69 +238,38 @@ async function main() {
     console.log({ alice, bob });
 
     // Table UserRole
-    await prisma.userRole.create({
-        data: {
-            user_id: alice.id,
-            role_id: roleClient.id,
-        },
-    });
-
-    await prisma.userRole.create({
-        data: {
-            user_id: bob.id,
-            role_id: roleAdmin.id,
-        },
-    });
+    await upsertUserRole(alice.id, roleClient.id);
+    await upsertUserRole(bob.id, roleAdmin.id);
 
     // Table RolePermission
-    await prisma.rolePermission.create({
-        data: {
-            role_id: roleAdmin.id,
-            permission_id: permRead.id,
-        },
-    });
-
-    await prisma.rolePermission.create({
-        data: {
-            role_id: roleAdmin.id,
-            permission_id: permWrite.id,
-        },
-    });
-
-    await prisma.rolePermission.create({
-        data: {
-            role_id: roleAdmin.id,
-            permission_id: permDelete.id,
-        },
-    });
+    await upsertRolePermission(roleAdmin.id, permRead.id);
+    await upsertRolePermission(roleAdmin.id, permWrite.id);
+    await upsertRolePermission(roleAdmin.id, permDelete.id);
 
     //table OrderProduct
-    await prisma.orderProduct.create({
-        data: {
+    if (alice.orders[0]) {
+        await ensureOrderProduct({
             order_id: alice.orders[0].id,
             product_id: prodJeans.id,
             quantity: 2,
             priceAtPurchase: 50,
-        },
-    });
-
-    await prisma.orderProduct.create({
-        data: {
-            order_id: bob.orders[0].id,
-            product_id: prodJacket.id,
-            quantity: 1,
-            priceAtPurchase: 100,
-        },
-    });
-
-    await prisma.orderProduct.create({
-        data: {
+        });
+        await ensureOrderProduct({
             order_id: alice.orders[0].id,
             product_id: prodTshirt.id,
             quantity: 3,
             priceAtPurchase: 20,
-        },
-    });
+        });
+    }
+
+    if (bob.orders[0]) {
+        await ensureOrderProduct({
+            order_id: bob.orders[0].id,
+            product_id: prodJacket.id,
+            quantity: 1,
+            priceAtPurchase: 100,
+        });
+    }
 }
 main()
     .then(async () => {

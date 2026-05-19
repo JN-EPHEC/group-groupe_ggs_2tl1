@@ -1,18 +1,16 @@
 import type { Request, Response, NextFunction } from 'express';
+import { userHasAdminRole } from '../utils/roles.js';
 
 const verifyAdmin = async (req: Request, res: Response, next: NextFunction) => {
-
-    if (!req.user.roles) {
-        return res.status(404).json({message: "Aucun rôle"})
-    };
-
-    for (let i of req.user.roles) {
-        if (i.role.name === "Admin") {
-            return next();
-        };
+    if (!req.user?.roles?.length) {
+        return res.status(403).json({ message: "Accès non autorisé" });
     }
 
-    return res.status(403).json({ message: "Accès non authorisé"});
-}
+    if (userHasAdminRole(req.user.roles)) {
+        return next();
+    }
+
+    return res.status(403).json({ message: "Accès non autorisé" });
+};
 
 export default verifyAdmin;

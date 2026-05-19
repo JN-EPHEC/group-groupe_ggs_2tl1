@@ -1,4 +1,5 @@
 export type StoredUser = {
+  id?: number;
   username?: string;
   email?: string;
   role?: string;
@@ -49,13 +50,25 @@ export function isAuthenticated(): boolean {
   return Boolean(getToken());
 }
 
+function roleNameFromEntry(entry: unknown): string | null {
+  if (typeof entry === "string") return entry;
+  if (entry && typeof entry === "object" && "role" in entry) {
+    const role = (entry as { role?: { name?: unknown } }).role;
+    if (role && typeof role.name === "string") return role.name;
+  }
+  return null;
+}
+
+export function flattenRoleNames(roles: unknown): string[] {
+  if (typeof roles === "string") return [roles];
+  if (!Array.isArray(roles)) return [];
+  return roles.map(roleNameFromEntry).filter((name): name is string => Boolean(name));
+}
+
 export function isAdminUser(user: StoredUser | null): boolean {
   if (!user) return false;
   if (user.isAdmin === true) return true;
   if (typeof user.role === "string" && user.role.toLowerCase() === "admin") return true;
-  const roles = user.roles;
-  if (Array.isArray(roles)) return roles.some((r) => String(r).toLowerCase() === "admin");
-  if (typeof roles === "string") return roles.toLowerCase().includes("admin");
-  return false;
+  return flattenRoleNames(user.roles).some((name) => name.toLowerCase() === "admin");
 }
 

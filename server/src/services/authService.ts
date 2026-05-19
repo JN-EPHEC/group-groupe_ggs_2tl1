@@ -1,6 +1,7 @@
 import prisma from "../config/prisma.js";
 import { randomBytes, scryptSync } from "node:crypto";
 import jwt from "jsonwebtoken";
+import { ROLE_CLIENT } from "../utils/roles.js";
 
 type RegisterInput = {
     username: string;
@@ -33,11 +34,24 @@ export const registerUser = async (input: RegisterInput) => {
     const password_hash = scryptSync(input.password, salt, 64).toString("hex");
 
     const createUser = await prisma.$transaction(async (tx) => {
+        const clientRole = await tx.role.findUnique({
+            where: { name: ROLE_CLIENT },
+        });
+
+        if (!clientRole) {
+            throw new Error("CLIENT_ROLE_NOT_FOUND");
+        }
+
         const user = await tx.user.create({
             data: {
                 username: input.username,
                 email: input.email,
-            }
+                roles: {
+                    create: {
+                        role_id: clientRole.id,
+                    },
+                },
+            },
         });
 
         await tx.credentials.create({
