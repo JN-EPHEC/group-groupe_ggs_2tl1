@@ -6,7 +6,7 @@ COPY server/package*.json ./
 RUN npm ci
 
 COPY prisma ../prisma
-RUN npx prisma generate --schema=./prisma/schema.prisma
+RUN npx prisma generate --schema=../prisma/schema.prisma
 
 COPY server/ .
 
