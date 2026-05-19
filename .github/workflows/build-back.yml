@@ -28,4 +28,4 @@ jobs:
           script: |
             cd ~/GGS
             docker compose pull
-            STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY}} docker compose up -d --force-recreate 
+            STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY}} JWT_SECRET=${{secrets.JWT_SECRET}} docker compose up -d --force-recreate 
