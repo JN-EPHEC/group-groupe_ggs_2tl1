@@ -14,7 +14,7 @@ const router = express.Router();
  *   name: Adresses
  *   description: Gestion des adresses de l'utilisateur connecté
  */
-
+ 
 /**
  * @swagger
  * /api/addresses/me:
@@ -31,7 +31,7 @@ const router = express.Router();
  *               items:
  *                 $ref: '#/components/schemas/Address'
  *       401:
- *         description: Utilisateur non authentifié
+ *         description: Token manquant ou invalide
  *         content:
  *           application/json:
  *             schema:
@@ -59,13 +59,13 @@ router.get("/me", addressControllers.getMyAddresses);
  *             schema:
  *               $ref: '#/components/schemas/Address'
  *       400:
- *         description: Champs adresse manquants
+ *         description: Champs adresse manquants ou invalides
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
  *       401:
- *         description: Utilisateur non authentifié
+ *         description: Token manquant ou invalide
  *         content:
  *           application/json:
  *             schema:
@@ -100,13 +100,13 @@ router.post("/me", validateAddressBody, addressControllers.createMyAddress);
  *             schema:
  *               $ref: '#/components/schemas/Address'
  *       400:
- *         description: Id invalide ou aucune donnée envoyée
+ *         description: ID invalide, body vide ou aucune donnée présente
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
  *       401:
- *         description: Utilisateur non authentifié
+ *         description: Token manquant ou invalide
  *         content:
  *           application/json:
  *             schema:
@@ -137,13 +137,13 @@ router.patch("/me/:id", checkIdParam, checkEmptyBody, addressControllers.updateM
  *       204:
  *         description: Adresse supprimée (aucun contenu retourné)
  *       400:
- *         description: Id adresse invalide
+ *         description: ID invalide
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
  *       401:
- *         description: Utilisateur non authentifié
+ *         description: Token manquant ou invalide
  *         content:
  *           application/json:
  *             schema:
