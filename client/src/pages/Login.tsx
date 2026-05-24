@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { flattenRoleNames, setStoredUser, setToken } from "../utils/auth";
+import { flattenRoleNames, setStoredUser } from "../utils/auth";
 
  export default function Login(){
   const [email,    setEmail]   = useState("")
@@ -18,19 +18,17 @@ import { flattenRoleNames, setStoredUser, setToken } from "../utils/auth";
       const response = await fetch(`/api/auth/login`, {
         method: "POST",
         headers : {"Content-Type": "application/json"},
+        credentials: "include",
         body : JSON.stringify({
           email,
           password
         }),
-        
         })
         console.log(email,password)
         const data = await response.json()
         if(!response.ok){
-          throw new Error( 'Identifiants incorects')
-        }
-        setToken(data.token);
-        console.log(data.token)  
+          throw new Error(data.message ?? 'Identifiants incorects')
+        }  
       await fetchProfile();
       navigate("/")  
 
@@ -42,16 +40,12 @@ import { flattenRoleNames, setStoredUser, setToken } from "../utils/auth";
   }
   // 2. Lors d'un appel protege
 const fetchProfile = async () => {
-const token = localStorage.getItem('token');
-
 const response = await fetch(`/api/users/me`, {
-headers: {
-'Authorization': `Bearer ${token}`
-}
+  credentials: "include",
 });
 if (response.status === 401) {
 // Le token a expire ! Il faudrait appeler la route /refresh ici.
-console.log("Token expire, veuillez vous reconnecter.");
+console.log("Session expirée, veuillez vous reconnecter.");
 return;
 }
 if (!response.ok) {
@@ -145,5 +139,4 @@ if (profile && typeof profile === "object") {
       </> 
     )
   }
-
 

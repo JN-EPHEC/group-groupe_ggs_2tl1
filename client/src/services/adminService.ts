@@ -1,14 +1,13 @@
-import { getToken } from "../utils/auth";
-
 async function adminFetch(path: string, options: RequestInit = {}) {
-  const token = getToken();
   const headers = new Headers(options.headers);
   headers.set("Content-Type", "application/json");
-  if (token) {
-    headers.set("Authorization", `Bearer ${token}`);
-  }
 
-  const response = await fetch(`/api/admin${path}`, { ...options, headers });
+  const response = await fetch(`/api/admin${path}`, {
+    ...options,
+    headers,
+    credentials: "include",
+  });
+
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {

@@ -7,7 +7,6 @@ export type StoredUser = {
   isAdmin?: boolean;
 };
 
-const TOKEN_KEY = "token";
 const USER_KEY = "user";
 
 function safeJsonParse(value: string | null): unknown {
@@ -19,16 +18,8 @@ function safeJsonParse(value: string | null): unknown {
   }
 }
 
-export function getToken(): string | null {
-  return localStorage.getItem(TOKEN_KEY);
-}
-
-export function setToken(token: string): void {
-  localStorage.setItem(TOKEN_KEY, token);
-}
-
 export function clearAuth(): void {
-  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem("token");
   localStorage.removeItem(USER_KEY);
 }
 
@@ -47,7 +38,7 @@ export function setStoredUser(user: StoredUser | null): void {
 }
 
 export function isAuthenticated(): boolean {
-  return Boolean(getToken());
+  return Boolean(getStoredUser());
 }
 
 function roleNameFromEntry(entry: unknown): string | null {
@@ -71,4 +62,3 @@ export function isAdminUser(user: StoredUser | null): boolean {
   if (typeof user.role === "string" && user.role.toLowerCase() === "admin") return true;
   return flattenRoleNames(user.roles).some((name) => name.toLowerCase() === "admin");
 }
-

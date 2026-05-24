@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { clearCart, getCart } from "../services/cartService";
 
 type OrderStatus = "loading" | "success" | "error" | "empty";
@@ -6,12 +6,19 @@ type OrderStatus = "loading" | "success" | "error" | "empty";
 function CheckoutSuccess() {
   const [status, setStatus] = useState<OrderStatus>("loading");
   const [message, setMessage] = useState("Création de votre commande...");
+  const hasSubmittedOrder = useRef(false);
 
   const sessionId = useMemo(() => {
     return new URLSearchParams(window.location.search).get("session_id");
   }, []);
 
   useEffect(() => {
+    if (hasSubmittedOrder.current) {
+      return;
+    }
+
+    hasSubmittedOrder.current = true;
+
     const createOrder = async () => {
       const cart = getCart();
 
@@ -27,20 +34,13 @@ function CheckoutSuccess() {
         return;
       }
 
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setStatus("error");
-        setMessage("Connecte-toi pour finaliser la commande.");
-        return;
-      }
-
       try {
         const response = await fetch("/api/orders", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
+          credentials: "include",
           body: JSON.stringify({
             items: cart.map((item) => ({
               product_id: item.product_id,
@@ -63,6 +63,7 @@ function CheckoutSuccess() {
         setStatus("success");
         setMessage("Paiement confirmé, votre commande est créée.");
       } catch (error) {
+        hasSubmittedOrder.current = false;
         setStatus("error");
         setMessage(error instanceof Error ? error.message : "Erreur commande.");
       }

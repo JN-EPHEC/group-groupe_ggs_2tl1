@@ -11,21 +11,24 @@ declare global {
 }
 const verifyAuth = async (req: Request, res: Response, next: NextFunction) => {
 
-    //Récupère le header
-    const authHeader = req.headers.authorization;
+    //récupère le token
+    const token = req.cookies?.accessToken;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    //vérifie si le token est présent
+    if (!token) {
         return res.status(401).json({ message: "Token manquant" });
     }
-
-    const token = authHeader.substring(7);
+    
+    //secret jwt
     const accessSecret = process.env.JWT_SECRET;
 
+    //vérifie que le jwt existe
     if (!accessSecret) {
         return res.status(500).json({ message: "JWT_SECRET non configuré" });
     }
 
     try {
+        //décode le jwt avec le secret
         const decoded: any = jwt.verify(token, accessSecret);
         //Vérifie que l'utilisateur existe en db
         const userId = decoded.userId;
