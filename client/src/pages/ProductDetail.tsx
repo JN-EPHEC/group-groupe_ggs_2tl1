@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { addToCart } from "../services/cartService";
 import { useProduct } from "../hooks/useProduct";
+import { productsByCategoryUrl } from "../utils/catalogUrls";
 
 const PRICE_FORMATTER = new Intl.NumberFormat("fr-BE", {
   style: "currency",
@@ -30,10 +31,25 @@ function ProductDetail() {
               &gt;
             </li>
             <li>
-              <Link to="/produits" className="hover:opacity-60">
-                Produits
+              <Link to="/catalogue" className="hover:opacity-60">
+                Catalogue
               </Link>
             </li>
+            {!isLoading && product?.category_id ? (
+              <>
+                <li aria-hidden="true" className="text-gray-400">
+                  &gt;
+                </li>
+                <li>
+                  <Link
+                    to={productsByCategoryUrl(product.category_id)}
+                    className="hover:opacity-60"
+                  >
+                    {product.category ?? "Catégorie"}
+                  </Link>
+                </li>
+              </>
+            ) : null}
             <li aria-hidden="true" className="text-gray-400">
               &gt;
             </li>

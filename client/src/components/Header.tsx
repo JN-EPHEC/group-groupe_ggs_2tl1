@@ -31,6 +31,11 @@ function Header() {
 
   const cartLabel = cartCount > 0 ? `Panier (${cartCount})` : "Panier";
 
+  const isCatalogueActive =
+    location.pathname === "/catalogue" ||
+    location.pathname === "/produits" ||
+    /^\/produits\/\d+$/.test(location.pathname);
+
   return (
     <header>
       <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -40,10 +45,8 @@ function Header() {
               Accueil
             </NavLink>
             <NavLink
-              to="/produits"
-              className={({ isActive }) =>
-                navLinkClassName({ isActive: isActive || location.pathname.startsWith("/produits/") })
-              }
+              to="/catalogue"
+              className={() => navLinkClassName({ isActive: isCatalogueActive })}
             >
               Catalogue
             </NavLink>
@@ -123,11 +126,9 @@ function Header() {
                 Accueil
               </NavLink>
               <NavLink
-                to="/produits"
+                to="/catalogue"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className={({ isActive }) =>
-                  navLinkClassName({ isActive: isActive || location.pathname.startsWith("/produits/") })
-                }
+                className={() => navLinkClassName({ isActive: isCatalogueActive })}
               >
                 Catalogue
               </NavLink>
