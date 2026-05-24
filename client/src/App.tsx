@@ -18,6 +18,7 @@ import Home from "./pages/Home.tsx";
 import LegalNotice from "./pages/LegalNotice.tsx";
 import Login from "./pages/Login.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import CatalogCategories from "./pages/CatalogCategories.tsx";
 import Product from "./pages/Product.tsx";
 import ProductDetail from "./pages/ProductDetail.tsx";
 import Register from "./pages/Register.tsx";
@@ -47,6 +48,7 @@ function App() {
         />
         <Route path="/login" element={<Navigate to="/connexion" replace />} />
         <Route path="/register" element={<Navigate to="/inscription" replace />} />
+        <Route path="/catalogue" element={<CatalogCategories />} />
         <Route path="/produits" element={<Product />} />
         <Route path="/produits/:id" element={<ProductDetail />} />
         <Route path="/panier" element={<Cart />} />
