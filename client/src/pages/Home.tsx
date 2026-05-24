@@ -1,14 +1,21 @@
+import { Link } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
+import { useCategories } from "../hooks/useCategories";
 import { useProducts } from "../hooks/useProducts";
+import { categoryUrlByName } from "../utils/catalogUrls";
 
-//Home page 
 const categories = [
   { label: "Nouveautés", sub: "Collection printemps" },
   { label: "Bestsellers", sub: "Les incontournables" },
-  { label: "Accessoires", sub: "Compléter le look" },
+  {
+    label: "Accessoires",
+    sub: "Compléter le look",
+    apiCategoryName: "Accessoires",
+  },
 ];
 
 function Home() {
+  const { categories: apiCategories } = useCategories();
   const {
     products: featuredProducts,
     isLoading: isLoadingFeatured,
@@ -17,6 +24,13 @@ function Home() {
     { limit: 4 },
     { loadErrorMessage: "Impossible de charger la sélection du moment." },
   );
+
+  const getCategoryHref = (tile: (typeof categories)[number]) => {
+    if (tile.apiCategoryName) {
+      return categoryUrlByName(apiCategories, tile.apiCategoryName);
+    }
+    return "/catalogue";
+  };
 
     return(
  <main className="bg-white text-black">
@@ -46,9 +60,9 @@ function Home() {
       <section className="px-10 py-20">
         <div className="grid grid-cols-3 gap-0.5">
           {categories.map((cat) => (
-            <a
+            <Link
               key={cat.label}
-              href="/produits"
+              to={getCategoryHref(cat)}
               className="bg-[#f5f3f0] px-10 py-16 block group hover:bg-[#ebe8e3] transition-colors duration-300"
             >
               <p className="text-[10px] tracking-[2px] uppercase text-gray-400 mb-3">
@@ -60,7 +74,7 @@ function Home() {
               <span className="text-[10px] tracking-[2px] uppercase border-b border-black pb-0.5 group-hover:opacity-40 transition-opacity duration-200">
                 Voir →
               </span>
-            </a>
+            </Link>
           ))}
         </div>
       </section>
