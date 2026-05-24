@@ -1,7 +1,5 @@
-import { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
-import { getProducts } from "../services/productService";
-import type { Product } from "../types/product";
+import { useProducts } from "../hooks/useProducts";
 
 //Home page 
 const categories = [
@@ -10,25 +8,15 @@ const categories = [
   { label: "Accessoires", sub: "Compléter le look" },
 ];
 
-function Home(){
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
-  const [isLoadingFeatured, setIsLoadingFeatured] = useState(true);
-  const [featuredError, setFeaturedError] = useState<string | null>(null);
-
-  useEffect(() => {
-    getProducts({ limit: 4 })
-      .then((products) => {
-        setFeaturedProducts(products.slice(0, 4));
-        setFeaturedError(null);
-      })
-      .catch((error) => {
-        console.error("Erreur lors du chargement des produits en homepage:", error);
-        setFeaturedError("Impossible de charger la sélection du moment.");
-      })
-      .finally(() => {
-        setIsLoadingFeatured(false);
-      });
-  }, []);
+function Home() {
+  const {
+    products: featuredProducts,
+    isLoading: isLoadingFeatured,
+    errorMessage: featuredError,
+  } = useProducts(
+    { limit: 4 },
+    { loadErrorMessage: "Impossible de charger la sélection du moment." },
+  );
 
     return(
  <main className="bg-white text-black">

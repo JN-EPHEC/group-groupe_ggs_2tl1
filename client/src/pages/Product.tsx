@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { getProducts } from "../services/productService";
-import type { Product as ProductModel } from "../types/product";
 import ProductCard from "../components/ProductCard";
+import { useProducts } from "../hooks/useProducts";
 
 const PAGE_SIZE = 12;
 
@@ -13,28 +12,12 @@ function clampPage(page: number, totalPages: number) {
 }
 
 function Product() {
-  const [products, setProducts] = useState<ProductModel[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { products, isLoading, errorMessage } = useProducts();
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    getProducts()
-      .then((result) => {
-        setProducts(result);
-        setCurrentPage(1);
-        setErrorMessage(null);
-      })
-      .catch((error) => {
-        console.error("Erreur lors de la recuperation des produits:", error);
-        setErrorMessage(
-          "Une erreur est survenue pendant le chargement des produits.",
-        );
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, []);
+    setCurrentPage(1);
+  }, [products]);
 
   const totalPages = Math.max(1, Math.ceil(products.length / PAGE_SIZE));
   const safePage = clampPage(currentPage, totalPages);
