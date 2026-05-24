@@ -19,6 +19,8 @@ import { errorHandler } from "./middlewares/errorHandlers.js";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./config/swagger.js";
 import cors from 'cors';
+import cookieParser from "cookie-parser";
+
 
 
 
@@ -50,19 +52,17 @@ const corsOptions = {
   credentials: true,
 };
 
-if (process.env.NODE_ENV !== "production") {
-  // En développement : CORS permissif
-  app.use(cors());
-} else {
-  // En production : CORS restreint
-  app.use(cors(corsOptions));
-}
+app.use(cors(corsOptions));
 
 app.use(express.json());
 
 //logger
 
 app.use(requestLogger)
+
+//middleware express lit automatiquement les cookies envoyés par le navigateur et les met dans req.cookies
+//pas mal ce bazar
+app.use(cookieParser());
 
 app.use('/api/admin',verifyAuth,verifyAdmin,adminUserRoutes)
 app.use('/api/users', verifyAuth,userRoutes);

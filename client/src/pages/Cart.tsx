@@ -41,13 +41,6 @@ function Cart() {
 
   const handleCheckout = async () => {
     setErrorMessage(null);
-
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setErrorMessage("Connecte-toi avant de passer au paiement.");
-      return;
-    }
-
     setIsCheckingOut(true);
 
     try {
@@ -55,8 +48,8 @@ function Cart() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
+        credentials: "include",
         body: JSON.stringify({
           items: cart.map((item) => ({
             product_id: item.product_id,

@@ -27,20 +27,13 @@ function CheckoutSuccess() {
         return;
       }
 
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setStatus("error");
-        setMessage("Connecte-toi pour finaliser la commande.");
-        return;
-      }
-
       try {
         const response = await fetch("/api/orders", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
+          credentials: "include",
           body: JSON.stringify({
             items: cart.map((item) => ({
               product_id: item.product_id,

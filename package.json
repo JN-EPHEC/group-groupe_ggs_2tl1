@@ -57,6 +57,7 @@
     "content-disposition": "^1.0.1",
     "content-type": "^1.0.5",
     "cookie": "^0.7.2",
+    "cookie-parser": "^1.4.7",
     "cookie-signature": "^1.2.2",
     "cors": "^2.8.6",
     "create-require": "^1.1.1",
@@ -243,6 +244,7 @@
   },
   "devDependencies": {
     "@prisma/adapter-pg": "^7.7.0",
+    "@types/cookie-parser": "^1.4.10",
     "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/mocha": "^10.0.10",

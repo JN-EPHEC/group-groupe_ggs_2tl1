@@ -30,10 +30,17 @@ function Header() {
       isActive ? "text-black border-b border-black pb-0.5" : "text-black hover:opacity-40"
     }`;
 
-  const logout = () => {
-    clearAuth();
-    setIsMobileMenuOpen(false);
-    navigate("/");
+  const logout = async () => {
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+    } finally {
+      clearAuth();
+      setIsMobileMenuOpen(false);
+      navigate("/");
+    }
   };
 
   const cartLabel = cartCount > 0 ? `Panier (${cartCount})` : "Panier";

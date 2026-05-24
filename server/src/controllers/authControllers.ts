@@ -6,7 +6,20 @@ export const authRegister = async (req: Request, res: Response, next: NextFuncti
     try {
         const result = await registerUser(req.body);
 
-        return res.status(201).json(result);
+        res.cookie("accessToken", result.token, { //crée un cookie nommé accesToken
+            //cookie non lisible coté frontend
+            httpOnly: true,
+            //si en prod, true --> envoyé uniquement en https
+            secure: process.env.NODE_ENV === "production",
+            //protege contre le cross site
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+            //expire après 1h comme le jwt
+            maxAge: 60 * 60 * 1000,
+        });
+
+        return res.status(201).json({
+            user: result.user,
+        });
     } catch (error) {
         if (error instanceof Error && error.message === "EMAIL_ALREADY_EXISTS") {
             return res.status(400).json({ message: "Compte utilisateur déjà existant" });
@@ -20,7 +33,21 @@ export const authRegister = async (req: Request, res: Response, next: NextFuncti
 export const authLogin = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const result = await loginUser(req.body);
-        return res.status(200).json(result);
+
+        res.cookie("accessToken", result.token, { //crée un cookie nommé accesToken
+            //cookie non lisible coté frontend
+            httpOnly: true,
+            //si en prod, true --> envoyé uniquement en https
+            secure: process.env.NODE_ENV === "production",
+            //protege contre le cross site
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+            //expire après 1h comme le jwt
+            maxAge: 60 * 60 * 1000,
+        });
+
+        return res.status(200).json({
+            user: result.user,
+        });
     } catch (error) {
         if (error instanceof Error && error.message === "USER_NOT_FOUND") {
             return res.status(400).json({ message: "Utilisateur introuvable" });
@@ -31,4 +58,14 @@ export const authLogin = async (req: Request, res: Response, next: NextFunction)
 
         return next(error);
     }
+};
+
+export const authLogout = async (_req: Request, res: Response) => {
+    res.clearCookie("accessToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    });
+
+    return res.status(204).send();
 };

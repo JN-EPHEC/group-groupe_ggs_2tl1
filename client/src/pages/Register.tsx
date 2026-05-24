@@ -1,8 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-
-const API_URL = import.meta.env.VITE_API_URL 
+import { flattenRoleNames, setStoredUser } from "../utils/auth";
 
 function Register() {
 // défition des variables d'état. [variable,fonction]
@@ -35,9 +34,10 @@ function Register() {
     if (password !== confirmPassword) {setError("Les mots de passe ne correspondent pas.");return;}
     if(wrongPwd.length > 0) {setError(wrongPwd); return}
     try {
-      const response = await fetch(`${API_URL}api/auth/register`, {
+      const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           username,
           email,
@@ -60,8 +60,24 @@ function Register() {
         throw new Error(data.message ?? "Impossible de creer le compte.");
       }
 
+      const user = data.user;
+      if (user && typeof user === "object") {
+        const idValue = (user as { id?: unknown }).id;
+        const usernameValue = (user as { username?: unknown }).username;
+        const emailValue = (user as { email?: unknown }).email;
+        const roleNames = flattenRoleNames((user as { roles?: unknown }).roles);
+
+        setStoredUser({
+          id: typeof idValue === "number" ? idValue : undefined,
+          username: typeof usernameValue === "string" ? usernameValue : undefined,
+          email: typeof emailValue === "string" ? emailValue : undefined,
+          roles: roleNames,
+          isAdmin: roleNames.some((name) => name.toLowerCase() === "admin"),
+        });
+      }
+
       setSuccess("Compte cree avec succes.");
-      setTimeout(() => navigate("/connexion"), 900);
+      setTimeout(() => navigate("/"), 900);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");
     } 
