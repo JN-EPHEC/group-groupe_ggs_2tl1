@@ -1,29 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { CART_UPDATED_EVENT, getCartCount } from "../services/cartService";
-import { clearAuth, getStoredUser, isAdminUser, isAuthenticated } from "../utils/auth";
+import { useAuthSnapshot } from "../hooks/useAuthSnapshot";
+import { useCartCount } from "../hooks/useCartCount";
+import { clearAuth } from "../utils/auth";
 
 function Header() {
   const location = useLocation();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
-
-  const authSnapshot = useMemo(() => {
-    void location.pathname;
-    const user = getStoredUser();
-    const connected = isAuthenticated();
-    const displayName = user?.username ?? user?.email ?? null;
-    const admin = isAdminUser(user);
-    return { connected, displayName, admin };
-  }, [location.pathname]);
-
-  useEffect(() => {
-    const refreshCartCount = () => setCartCount(getCartCount());
-    refreshCartCount();
-    window.addEventListener(CART_UPDATED_EVENT, refreshCartCount);
-    return () => window.removeEventListener(CART_UPDATED_EVENT, refreshCartCount);
-  }, []);
+  const authSnapshot = useAuthSnapshot();
+  const cartCount = useCartCount();
 
   const navLinkClassName = ({ isActive }: { isActive: boolean }) =>
     `text-[11px] tracking-widest uppercase transition-opacity duration-200 ${
