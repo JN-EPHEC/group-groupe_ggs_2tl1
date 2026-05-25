@@ -20,12 +20,28 @@ import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./config/swagger.js";
 import cors from 'cors';
 import cookieParser from "cookie-parser";
-
+import helmet from "helmet";
 
 
 
 const app = express();
 const port = Number(process.env.PORT ?? 3000);
+//HELMET. Securité (Current security policy. Cest pour eviter les scripts malveillants. on accepe que ce qui vient de chez nous => src == self)
+app.use(
+  helmet({
+    contentSecurityPolicy:
+      process.env.NODE_ENV === "production"
+        ? {
+            directives: {
+              defaultSrc: ["'self'"],
+              scriptSrc: ["'self'"],
+              styleSrc: ["'self'", "'unsafe-inline'"],
+              imgSrc: ["'self'", "data:"],
+            },
+          }
+        : false,
+  })
+);
 
 async function startServer() {
   try {
