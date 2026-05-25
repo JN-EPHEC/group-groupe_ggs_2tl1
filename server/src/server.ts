@@ -21,11 +21,13 @@ import { swaggerSpec } from "./config/swagger.js";
 import cors from 'cors';
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
-
+import compression from "compression"
 
 
 const app = express();
 const port = Number(process.env.PORT ?? 3000);
+//logger
+app.use(requestLogger)
 //HELMET. Securité (Current security policy. Cest pour eviter les scripts malveillants. on accepe que ce qui vient de chez nous => src == self)
 app.use(
   helmet({
@@ -42,6 +44,11 @@ app.use(
         : false,
   })
 );
+//compression des reponses
+app.use(compression())
+
+//redirection des 304 (sans ca, ca recharge a cbaque fois)
+app.set("etag", "strong");
 
 async function startServer() {
   try {
@@ -72,9 +79,7 @@ app.use(cors(corsOptions));
 
 app.use(express.json());
 
-//logger
 
-app.use(requestLogger)
 
 //middleware express lit automatiquement les cookies envoyés par le navigateur et les met dans req.cookies
 //pas mal ce bazar
