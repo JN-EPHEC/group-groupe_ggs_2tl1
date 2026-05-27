@@ -1,0 +1,23 @@
+name: Monitor Application Health
+on:
+    schedule:
+        - cron: '*/30 * * * *'
+
+jobs:
+    health-check:
+        runs-on: ubuntu-latest # Runner
+        steps:
+        - name: Check website health # Actions
+          run: curl --fail --max-time 10 https://www.l1-6.ephec-ti.be || exit 1
+        - name: Notify failure
+          if: failure()
+          uses: actions/github-script@v6 #V3 obsolete mdr
+          with:
+            script: |
+                await github.rest.issues.create({ 
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: 'Health Check failed',
+                body: 'The health check for https://www.l1-6.ephec-ti.be failed'
+                })
+            #V6 + await pour attendre quoi (que lissuie soit créé)
