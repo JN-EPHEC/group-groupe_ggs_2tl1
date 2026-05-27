@@ -6,7 +6,7 @@ jobs:
         steps:
             - uses: actions/checkout@v3
             - name: RUN ZAP Security Scan
-              uses: zaproxy/actions-baseline@v0.10.0
+              uses: zaproxy/actions-baseline@v0.4.0
               with:
                 target: 'https://www.l1-6.ephec-ti.be'
             - name: Upload ZAP Scan Results
