@@ -1,0 +1,16 @@
+name: security-check
+on: [push]
+jobs:
+    security-scan:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - name: RUN ZAP Security Scan
+              uses: zaproxy/actions-baseline@v0.10.0
+              with:
+                target: 'https://www.l1-6.ephec-ti.be'
+            - name: Upload ZAP Scan Results
+              uses: actions/upload-artifact@v4
+              with:
+                name: zap-report
+                path: zap_report.xml
