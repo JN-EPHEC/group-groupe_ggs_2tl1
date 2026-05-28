@@ -11,6 +11,7 @@ const adminLinks = [
   { to: "/admin", label: "Tableau de bord", end: true as const },
   { to: "/admin/utilisateurs", label: "Utilisateurs" },
   { to: "/admin/stocks", label: "Stocks" },
+  { to: "/admin/produits/nouveau", label: "Nouveau produit" },
   { to: "/admin/commandes", label: "Commandes" },
   { to: "/admin/categories", label: "Catégories" },
 ];

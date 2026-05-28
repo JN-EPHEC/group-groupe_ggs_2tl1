@@ -71,6 +71,7 @@ function App() {
           <Route path="utilisateurs" element={<AdminUserList />} />
           <Route path="utilisateurs/:id" element={<AdminUserDetail />} />
           <Route path="stocks" element={<AdminStockList />} />
+          <Route path="produits/nouveau" element={<AdminProductForm />} />
           <Route path="produits/:id" element={<AdminProductForm />} />
           <Route path="commandes" element={<AdminOrders />} />
           <Route path="categories" element={<AdminCategories />} />
