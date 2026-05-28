@@ -38,6 +38,7 @@ const router = express.Router();
  *               $ref: '#/components/schemas/Error'
  */
 
+router.post('/register', validateRegisterBody, authControllers.authRegister);
 router.post('/login', validateLoginBody, authControllers.authLogin);
 
 
