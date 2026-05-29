@@ -30,7 +30,7 @@ jobs:
             docker compose pull
             STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY}} \
              JWT_SECRET=${{secrets.JWT_SECRET}} \
-             CLIENT_URL=${{secrets.VITE_API_URL}} \
+             clientUrl=${{secrets.VITE_API_URL}} \
              CORS_ORIGIN=${{ secrets.CORS_ORIGIN }} \
              DATABASE_URL=${{ secrets.DATABASE_URL }} \
              NODE_ENV=production \
