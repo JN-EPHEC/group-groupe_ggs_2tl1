@@ -4,15 +4,7 @@ import { useCategories } from "../hooks/useCategories";
 import { useProducts } from "../hooks/useProducts";
 import { categoryUrlByName } from "../utils/catalogUrls";
 
-const categories = [
-  { label: "Nouveautés", sub: "Collection printemps" },
-  { label: "Bestsellers", sub: "Les incontournables" },
-  {
-    label: "Accessoires",
-    sub: "Compléter le look",
-    apiCategoryName: "Accessoires",
-  },
-];
+
 
 function Home() {
   const { categories: apiCategories } = useCategories();
@@ -55,34 +47,44 @@ function Home() {
           </a>
         </div>
       </section>
-
-      {/* ── CATEGORIES ── */}
+            {/* ── CATEGORIES ── */}
       <section className="px-10 py-20">
+        <div className="flex items-baseline justify-between mb-10">
+        <h2 className="text-3xl font-serif font-normal mb-10">Catégories phares</h2>
+        <a
+            href="/categories"
+            className="text-[10px] tracking-[2px] uppercase border-b border-black pb-0.5 hover:opacity-40 transition-opacity duration-200"
+          >
+            Afficher toutes les catégories
+          </a>
+          </div>
         <div className="grid grid-cols-3 gap-0.5">
-          {categories.map((cat) => (
-            <Link
-              key={cat.label}
-              to={getCategoryHref(cat)}
-              className="bg-[#f5f3f0] px-10 py-16 block group hover:bg-[#ebe8e3] transition-colors duration-300"
-            >
-              <p className="text-[10px] tracking-[2px] uppercase text-gray-400 mb-3">
-                {cat.sub}
-              </p>
-              <h2 className="text-2xl font-serif font-normal mb-5">
-                {cat.label}
-              </h2>
-              <span className="text-[10px] tracking-[2px] uppercase border-b border-black pb-0.5 group-hover:opacity-40 transition-opacity duration-200">
-                Voir →
-              </span>
-            </Link>
-          ))}
+          
+          {apiCategories.slice(0,3).map((cat) => (
+          <Link
+            key={cat.id}
+            to={categoryUrlByName(apiCategories, cat.name)}
+            className="bg-[#f5f3f0] px-10 py-16 block group hover:bg-[#ebe8e3] transition-colors duration-300"
+          >
+            <p className="text-[10px] tracking-[2px] uppercase text-gray-400 mb-3">
+              {cat.description}
+            </p>
+            <h2 className="text-2xl  font-serif font-normal mb-5">
+              {cat.name}
+            </h2>
+            <span className="text-[10px] tracking-[2px] uppercase border-b border-black pb-0.5 group-hover:opacity-40 transition-opacity duration-200">
+              Voir →
+            </span>
+          </Link>
+        ))}
         </div>
       </section>
+
 
       {/* ── FEATURED PRODUCTS ── */}
       <section className="px-10 pb-20">
         <div className="flex items-baseline justify-between mb-10">
-          <h2 className="text-3xl font-serif font-normal">Sélection du moment</h2>
+          <h2 className="text-3xl font-serif font-normal ">Sélection du moment</h2>
           <a
             href="/produits"
             className="text-[10px] tracking-[2px] uppercase border-b border-black pb-0.5 hover:opacity-40 transition-opacity duration-200"

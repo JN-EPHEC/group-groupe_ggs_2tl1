@@ -57,7 +57,10 @@ function Cart() {
           })),
         }),
       });
-
+       if (response.status === 401) {
+        setErrorMessage("not_logged_in");
+        return;
+      }
       const data = await response.json();
 
       if (!response.ok) {
@@ -158,7 +161,11 @@ function Cart() {
             </div>
 
             {errorMessage && (
-              <p className="mt-4 text-sm text-red-600">{errorMessage}</p>
+              <p className="mt-4 text-sm text-red-600">
+                {errorMessage === "not_logged_in"&& "Veuillez vous enregistrer afin de finaliser votre commande:  "}
+                 {errorMessage === "not_logged_in"&&<Link to="/login" state={{ from: "/panier" }} className=" underline text-black hover:opacity-40">Se connecter</Link>}
+                 {errorMessage !== "not_logged_in" && errorMessage}
+              </p>
             )}
           </div>
         )}

@@ -158,7 +158,7 @@ Nous avons retenu le code de **Gregory Ly**, car il avait une structure claire, 
 
 - **GitHub Actions** : pipeline CI/CD qui lance les tests, build les images Docker et déploie sur le serveur à chaque push sur `main`
 - **Docker / Docker Compose** : conteneurisation de chaque service (client, server) pour garantir un environnement reproductible. Il y a une petite gestion de micro service (juste pour le chemin des paiements)
-- **Nginx** : reverse proxy qui redirige les requêtes HTTP/HTTPS vers le bon conteneur (frontend ou API) + limit_req qui limite les attaques DDOS
+- **Nginx** : reverse proxy qui redirige les requêtes HTTP/HTTPS vers le bon conteneur (frontend ou API) + limit_req qui limite les attaques DDOS + header pour les securités owasp
 - **Supabase** : base de données PostgreSQL hébergée externement (hors VPS), remplace le MySQL local. Le serveur Node.js s'y connecte via Prisma avec l'URL de connexion Supabase
 - **Redis (optionnel)** : couche de cache en mémoire pour éviter des requêtes répétées vers Supabase. Si une donnée est en cache, le serveur la retourne directement sans interroger la DB
 

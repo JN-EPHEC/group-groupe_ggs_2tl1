@@ -91,6 +91,7 @@ model Products {
 model Categories {
   id   Int    @id @default(autoincrement())
   name String @unique
+  description String
 
   products Products[]
 }

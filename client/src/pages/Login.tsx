@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { flattenRoleNames, setStoredUser } from "../utils/auth";
 
  export default function Login(){
@@ -9,12 +9,15 @@ import { flattenRoleNames, setStoredUser } from "../utils/auth";
   const [error,    setError]   = useState("")
   const [sucess,  setSuccess] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation();
+  const from = location.state?.from ?? "/";
     // 1. Lors de la connexion
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess(true);
     try{
+     
       const response = await fetch(`/api/auth/login`, {
         method: "POST",
         headers : {"Content-Type": "application/json"},
@@ -29,7 +32,7 @@ import { flattenRoleNames, setStoredUser } from "../utils/auth";
           throw new Error(data.message ?? 'Identifiants incorects')
         }  
       await fetchProfile();
-      navigate("/")  
+      navigate(from)  
 
       } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue.")
