@@ -69,8 +69,11 @@ export const createCheckoutSessionService = async (input: CheckoutInput) => {
       quantity: item.quantity,
     };
   });
+  const clientUrl = process.env.CLIENT_URL;
 
-  const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+  if (!clientUrl) {
+    throw new Error("CLIENT_URL_MISSING");
+  }
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],
