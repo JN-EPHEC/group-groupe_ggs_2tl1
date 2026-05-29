@@ -35,3 +35,7 @@ jobs:
              DATABASE_URL=${{ secrets.DATABASE_URL }} \
              NODE_ENV=production \
              docker compose up -d --force-recreate 
+            for service in $(docker compose ps --services); do
+              echo "Checking CLIENT_URL in $service"
+              docker compose exec -T "$service" sh -lc 'if [ -n "$CLIENT_URL" ]; then echo "CLIENT_URL_SET"; else echo "CLIENT_URL_MISSING"; fi' || true
+            done
