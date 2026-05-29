@@ -17,12 +17,7 @@ function Home() {
     { loadErrorMessage: "Impossible de charger la sélection du moment." },
   );
 
-  const getCategoryHref = (tile: (typeof categories)[number]) => {
-    if (tile.apiCategoryName) {
-      return categoryUrlByName(apiCategories, tile.apiCategoryName);
-    }
-    return "/catalogue";
-  };
+
 
     return(
  <main className="bg-white text-black">
