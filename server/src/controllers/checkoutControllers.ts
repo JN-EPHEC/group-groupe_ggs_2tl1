@@ -14,6 +14,9 @@ export const createCheckoutSession = async (req: Request,res: Response,next: Nex
     if (error instanceof Error && error.message === "PRODUCTS_NOT_FOUND") {
       return res.status(404).json({ message: "Un ou plusieurs produits sont introuvables" });
     }
+    if (error instanceof Error && error.message === "CLIENT_URL_MISSING") {
+      return res.status(404).json({ message: "Url incorrecte" });
+    }
 
     return next(error);
   }
