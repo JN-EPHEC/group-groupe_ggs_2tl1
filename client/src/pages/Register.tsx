@@ -16,7 +16,7 @@ function Register() {
   const [state, setState] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [country, setCountry] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string | string[]>("");
   const [success, setSuccess] = useState("");
 
 //lors de la soumission du form, e.prevendefault, on connait, éviter de recharger la page. setError+ setSucces,remise a 0 des messages succes/erreur
@@ -25,14 +25,14 @@ function Register() {
     setError("");
     setSuccess("");
 //vérifier les 2 mots de passe.
-  let wrongPwd = ''
-     if(password.length < 8){ wrongPwd +='8 caracteres minimum '; }
-    if(!password.match(/[A-Z]/)){wrongPwd +='une majuscule '; }
-    if(!password.match(/[a-z]/)){wrongPwd +='une minuscule '; }
-    if(!password.match(/[0-9]/)){wrongPwd +='un nombre'; }
-    if(!password.match(/[!@#$%^&*(),.?":{}|<>_\-\\[\]/+=]/)){wrongPwd +='un caractère spécial '; }
-    if (password !== confirmPassword) {setError("Les mots de passe ne correspondent pas.");return;}
-    if(wrongPwd.length > 0) {setError(wrongPwd); return}
+  let wrongPwd ="";
+    if(password.length < 8)      wrongPwd += "8 caractères minimum, ";
+    if(!password.match(/[A-Z]/))  wrongPwd += "une majuscule, ";
+    if(!password.match(/[a-z]/))  wrongPwd += "une minuscule, ";
+    if(!password.match(/[0-9]/))  wrongPwd += "un nombre, ";
+    if(!password.match(/[!@#$%^&*(),.?":{}|<>_\-\\[\]/+=]/)) wrongPwd += "un caractère spécial, ";
+    if (wrongPwd.length > 0) {
+  setError("Mot de passe invalide, votre mot de passe doit contenir : " + wrongPwd.slice(0, -2) + '.');return;} 
     try {
       const response = await fetch("/api/auth/register", {
         method: "POST",
