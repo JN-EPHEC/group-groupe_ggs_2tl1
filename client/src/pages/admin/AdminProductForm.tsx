@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
+  createAdminProduct,
   deleteAdminProduct,
   fetchAdminProduct,
   fetchCategories,
@@ -12,7 +13,8 @@ import {
 export default function AdminProductForm() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const productId = Number(id);
+  const isCreateMode = id === undefined;
+  const productId = isCreateMode ? null : Number(id);
 
   const [product, setProduct] = useState<AdminProductDetail | null>(null);
   const [categories, setCategories] = useState<CategoryOption[]>([]);
@@ -29,32 +31,40 @@ export default function AdminProductForm() {
   const [deleting, setDeleting] = useState(false);
 
   const loadData = useCallback(async () => {
-    if (!Number.isInteger(productId) || productId <= 0) {
-      setError("Produit invalide");
-      setLoading(false);
-      return;
+    if (!isCreateMode) {
+      if (!Number.isInteger(productId) || productId! <= 0) {
+        setError("Produit invalide");
+        setLoading(false);
+        return;
+      }
     }
 
     setLoading(true);
     setError("");
     try {
-      const [productData, categoryData] = await Promise.all([
-        fetchAdminProduct(productId),
-        fetchCategories(),
-      ]);
-      setProduct(productData);
+      const categoryData = await fetchCategories();
       setCategories(categoryData);
-      setName(productData.name);
-      setDescription(productData.description);
-      setPrice(String(productData.price));
-      setStock(String(productData.stock));
-      setCategoryId(String(productData.category_id));
+
+      if (isCreateMode) {
+        if (categoryData.length > 0) {
+          setCategoryId(String(categoryData[0].id));
+        }
+        setProduct(null);
+      } else {
+        const productData = await fetchAdminProduct(productId!);
+        setProduct(productData);
+        setName(productData.name);
+        setDescription(productData.description);
+        setPrice(String(productData.price));
+        setStock(String(productData.stock));
+        setCategoryId(String(productData.category_id));
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Chargement impossible");
     } finally {
       setLoading(false);
     }
-  }, [productId]);
+  }, [isCreateMode, productId]);
 
   useEffect(() => {
     void loadData();
@@ -65,24 +75,39 @@ export default function AdminProductForm() {
     setSaving(true);
     setError("");
     setSuccess("");
+
+    const payload = {
+      name: name.trim(),
+      description: description.trim(),
+      price: Number(price),
+      stock: Number(stock),
+      category_id: Number(categoryId),
+    };
+
     try {
-      const updated = await updateAdminProduct(productId, {
-        name: name.trim(),
-        description: description.trim(),
-        price: Number(price),
-        stock: Number(stock),
-        category_id: Number(categoryId),
-      });
+      if (isCreateMode) {
+        const created = await createAdminProduct(payload);
+        navigate("/admin/stocks", {
+          state: { message: `Produit « ${created.name} » créé avec succès.` },
+        });
+        return;
+      }
+
+      const updated = await updateAdminProduct(productId!, payload);
       setProduct(updated);
       setSuccess("Produit mis à jour avec succès.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Mise à jour impossible");
+      setError(err instanceof Error ? err.message : "Enregistrement impossible");
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async () => {
+    if (isCreateMode || productId === null) {
+      return;
+    }
+
     setDeleting(true);
     setError("");
     try {
@@ -108,12 +133,25 @@ export default function AdminProductForm() {
     return <p className="text-sm text-gray-600">Chargement…</p>;
   }
 
-  if (!product) {
+  if (!isCreateMode && !product) {
     return (
       <>
         <p className="text-red-600 text-sm mb-4">{error || "Produit introuvable"}</p>
         <Link to="/admin/stocks" className="text-[10px] tracking-[1px] uppercase underline">
           Retour aux stocks
+        </Link>
+      </>
+    );
+  }
+
+  if (isCreateMode && categories.length === 0) {
+    return (
+      <>
+        <p className="text-red-600 text-sm mb-4">
+          Aucune catégorie disponible. Créez une catégorie avant d&apos;ajouter un produit.
+        </p>
+        <Link to="/admin/categories" className="text-[10px] tracking-[1px] uppercase underline">
+          Gérer les catégories
         </Link>
       </>
     );
@@ -128,8 +166,10 @@ export default function AdminProductForm() {
         ← Retour aux stocks
       </Link>
 
-      <h2 className="text-xl font-serif font-normal mb-2">Modifier le produit</h2>
-      {!product.isActive && (
+      <h2 className="text-xl font-serif font-normal mb-2">
+        {isCreateMode ? "Ajouter un produit" : "Modifier le produit"}
+      </h2>
+      {!isCreateMode && product && !product.isActive && (
         <p className="text-sm text-amber-700 mb-4">Ce produit est désactivé (hors catalogue).</p>
       )}
 
@@ -209,15 +249,21 @@ export default function AdminProductForm() {
             disabled={saving}
             className="px-5 py-2 text-[10px] tracking-[2px] uppercase bg-black text-white hover:opacity-70 disabled:opacity-40"
           >
-            {saving ? "Enregistrement…" : "Enregistrer"}
+            {saving
+              ? "Enregistrement…"
+              : isCreateMode
+                ? "Créer le produit"
+                : "Enregistrer"}
           </button>
-          <button
-            type="button"
-            onClick={() => setShowDeleteModal(true)}
-            className="px-5 py-2 text-[10px] tracking-[2px] uppercase border border-red-700 text-red-700 hover:opacity-60"
-          >
-            Supprimer
-          </button>
+          {!isCreateMode && (
+            <button
+              type="button"
+              onClick={() => setShowDeleteModal(true)}
+              className="px-5 py-2 text-[10px] tracking-[2px] uppercase border border-red-700 text-red-700 hover:opacity-60"
+            >
+              Supprimer
+            </button>
+          )}
         </div>
       </form>
 

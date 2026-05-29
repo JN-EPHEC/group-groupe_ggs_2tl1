@@ -79,10 +79,20 @@ export default function AdminStockList() {
 
   return (
     <>
-      <h2 className="text-xl font-serif font-normal mb-4">Stocks</h2>
-      <p className="text-sm text-gray-600 mb-6">
-        Produits en rupture (0) ou stock faible (≤ {LOW_STOCK_THRESHOLD}) mis en évidence.
-      </p>
+      <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
+        <div>
+          <h2 className="text-xl font-serif font-normal mb-2">Stocks</h2>
+          <p className="text-sm text-gray-600">
+            Produits en rupture (0) ou stock faible (≤ {LOW_STOCK_THRESHOLD}) mis en évidence.
+          </p>
+        </div>
+        <Link
+          to="/admin/produits/nouveau"
+          className="px-5 py-2 text-[10px] tracking-[2px] uppercase bg-black text-white hover:opacity-70 shrink-0"
+        >
+          Ajouter un produit
+        </Link>
+      </div>
 
       {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
       {flashMessage && <p className="text-green-700 text-sm mb-4">{flashMessage}</p>}

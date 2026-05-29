@@ -107,6 +107,19 @@ export function fetchAdminProduct(id: number) {
   return adminFetch(`/products/${id}`) as Promise<AdminProductDetail>;
 }
 
+export function createAdminProduct(payload: {
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  category_id: number;
+}) {
+  return adminFetch("/products", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  }) as Promise<AdminProductDetail>;
+}
+
 export function updateAdminProduct(
   id: number,
   payload: {
