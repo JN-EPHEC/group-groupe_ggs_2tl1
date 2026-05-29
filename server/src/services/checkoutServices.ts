@@ -70,7 +70,7 @@ export const createCheckoutSessionService = async (input: CheckoutInput) => {
     };
   });
   const clientUrl = process.env.CLIENT_URL;
-
+  //vérifie si l'url existe
   if (!clientUrl) {
     throw new Error("CLIENT_URL_MISSING");
   }
