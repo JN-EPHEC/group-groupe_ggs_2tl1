@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { getProductById } from "../services/productService";
 import { addToCart } from "../services/cartService";
-import type { Product } from "../types/product";
+import { useProduct } from "../hooks/useProduct";
+import { productsByCategoryUrl } from "../utils/catalogUrls";
 
 const PRICE_FORMATTER = new Intl.NumberFormat("fr-BE", {
   style: "currency",
@@ -14,29 +14,8 @@ const PRICE_FORMATTER = new Intl.NumberFormat("fr-BE", {
 function ProductDetail() {
   const { id: productId = "" } = useParams();
 
-  const [product, setProduct] = useState<Product | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { product, isLoading, errorMessage } = useProduct(productId);
   const [cartMessage, setCartMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-    getProductById(productId)
-      .then((result) => {
-        setProduct(result);
-        setErrorMessage(null);
-      })
-      .catch((error) => {
-        const status = error?.response?.status;
-        if (status === 404) {
-          setErrorMessage("Produit introuvable.");
-          return;
-        }
-        setErrorMessage("Erreur lors du chargement du produit.");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [productId]);
 
   return (
     <main className="bg-white text-black min-h-[70vh] px-6 md:px-10 py-10">
@@ -52,10 +31,25 @@ function ProductDetail() {
               &gt;
             </li>
             <li>
-              <Link to="/produits" className="hover:opacity-60">
-                Produits
+              <Link to="/catalogue" className="hover:opacity-60">
+                Catalogue
               </Link>
             </li>
+            {!isLoading && product?.category_id ? (
+              <>
+                <li aria-hidden="true" className="text-gray-400">
+                  &gt;
+                </li>
+                <li>
+                  <Link
+                    to={productsByCategoryUrl(product.category_id)}
+                    className="hover:opacity-60"
+                  >
+                    {product.category ?? "Catégorie"}
+                  </Link>
+                </li>
+              </>
+            ) : null}
             <li aria-hidden="true" className="text-gray-400">
               &gt;
             </li>

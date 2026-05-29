@@ -1,34 +1,36 @@
-import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
-import { getProducts } from "../services/productService";
-import type { Product } from "../types/product";
+import { useCategories } from "../hooks/useCategories";
+import { useProducts } from "../hooks/useProducts";
+import { categoryUrlByName } from "../utils/catalogUrls";
 
-//Home page 
 const categories = [
   { label: "Nouveautés", sub: "Collection printemps" },
   { label: "Bestsellers", sub: "Les incontournables" },
-  { label: "Accessoires", sub: "Compléter le look" },
+  {
+    label: "Accessoires",
+    sub: "Compléter le look",
+    apiCategoryName: "Accessoires",
+  },
 ];
 
-function Home(){
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
-  const [isLoadingFeatured, setIsLoadingFeatured] = useState(true);
-  const [featuredError, setFeaturedError] = useState<string | null>(null);
+function Home() {
+  const { categories: apiCategories } = useCategories();
+  const {
+    products: featuredProducts,
+    isLoading: isLoadingFeatured,
+    errorMessage: featuredError,
+  } = useProducts(
+    { limit: 4 },
+    { loadErrorMessage: "Impossible de charger la sélection du moment." },
+  );
 
-  useEffect(() => {
-    getProducts({ limit: 4 })
-      .then((products) => {
-        setFeaturedProducts(products.slice(0, 4));
-        setFeaturedError(null);
-      })
-      .catch((error) => {
-        console.error("Erreur lors du chargement des produits en homepage:", error);
-        setFeaturedError("Impossible de charger la sélection du moment.");
-      })
-      .finally(() => {
-        setIsLoadingFeatured(false);
-      });
-  }, []);
+  const getCategoryHref = (tile: (typeof categories)[number]) => {
+    if (tile.apiCategoryName) {
+      return categoryUrlByName(apiCategories, tile.apiCategoryName);
+    }
+    return "/catalogue";
+  };
 
     return(
  <main className="bg-white text-black">
@@ -58,9 +60,9 @@ function Home(){
       <section className="px-10 py-20">
         <div className="grid grid-cols-3 gap-0.5">
           {categories.map((cat) => (
-            <a
+            <Link
               key={cat.label}
-              href="/produits"
+              to={getCategoryHref(cat)}
               className="bg-[#f5f3f0] px-10 py-16 block group hover:bg-[#ebe8e3] transition-colors duration-300"
             >
               <p className="text-[10px] tracking-[2px] uppercase text-gray-400 mb-3">
@@ -72,7 +74,7 @@ function Home(){
               <span className="text-[10px] tracking-[2px] uppercase border-b border-black pb-0.5 group-hover:opacity-40 transition-opacity duration-200">
                 Voir →
               </span>
-            </a>
+            </Link>
           ))}
         </div>
       </section>
