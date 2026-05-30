@@ -69,7 +69,7 @@ export const createCheckoutSessionService = async (input: CheckoutInput) => {
       quantity: item.quantity,
     };
   });
-  const clientUrl = process.env.CLIENT_URL;
+  const clientUrl = process.env.CLIENT_URL 
   console.log(clientUrl);
   //vérifie si l'url existe
   if (!clientUrl) {

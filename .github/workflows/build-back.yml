@@ -29,13 +29,10 @@ jobs:
             cd ~/GGS
             docker compose pull
             STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY}} \
-             JWT_SECRET=${{secrets.JWT_SECRET}} \
-             CLIENT_URL=${{ secrets.CLIENT_URL }} \
-             CORS_ORIGIN=${{ secrets.CORS_ORIGIN }} \
-             DATABASE_URL=${{ secrets.DATABASE_URL }} \
-             NODE_ENV=production \
-             docker compose up -d --force-recreate 
-            for service in $(docker compose ps --services); do
-              echo "Checking CLIENT_URL in $service"
-              docker compose exec -T "$service" sh -lc 'if [ -n "$CLIENT_URL" ]; then echo "CLIENT_URL_SET"; else echo "CLIENT_URL_MISSING"; fi' || true
-            done
+            JWT_SECRET=${{secrets.JWT_SECRET}} \
+            CLIENT_URL=${{secrets.VITE_API_URL}} \
+            CORS_ORIGIN=${{ secrets.CORS_ORIGIN }} \
+            DATABASE_URL=${{ secrets.DATABASE_URL }} \
+            NODE_ENV=production \
+            docker compose up -d --force-recreate 
+            
