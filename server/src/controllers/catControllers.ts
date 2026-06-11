@@ -1,32 +1,26 @@
-import type { Request, Response, NextFunction } from 'express'
-import prisma from '../config/prisma'
+import type { Request, Response, NextFunction } from "express";
+import { allCategories, oneCat } from "../services/catServices.js";
 
+export const getAllCat = async (_req: Request, res: Response, next: NextFunction) => {
+  try {
+    const result = await allCategories();
 
+    return res.status(200).json(result);
+  } catch (error) {
+    return next(error);
+  }
+};
 
-// GET ALL catégories
-
-export const getAllCat = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const categorie = await prisma.categories.findMany({})
-
-        return res.status(200).json(categorie)
-    } catch (err) { next(err) }
-}
-//GET ONE catégorie
 export const getOneCat = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const id = req.params.id;
-        const categorie = await prisma.categories.findUnique({ 
-            where: { id: Number(id) } 
-        });
+  try {
+    const result = await oneCat(Number(req.params.id));
 
-        if (!categorie) {
-            return res.status(404).json({ message: `La catégorie portant l'id:${id} n'existe pas` })
-        };
+    return res.status(200).json(result);
+  } catch (error) {
+    if (error instanceof Error && error.message === "CAT_NOT_FOUND") {
+      return res.status(404).json({ message: "Catégorie introuvable" });
+    }
 
-        return res.status(200).json(categorie)
-    }
-    catch (err) {
-        next(err)
-    }
-}
+    return next(error);
+  }
+};

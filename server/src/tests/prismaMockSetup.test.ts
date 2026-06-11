@@ -1,3 +1,4 @@
+import { describe, expect, it } from "@jest/globals";
 import prisma from "../config/prisma.js";
 import { prismaMock } from "./setup/prisma.singleton";
 

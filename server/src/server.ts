@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 import express from 'express';
 import userRoutes from './routes/userRoutes.js';
 import addressRoutes from './routes/addressRoutes.js';
@@ -6,8 +8,12 @@ import authControllers from './routes/authRoutes.js';
 import adminUserRoutes from './routes/adminUserRoutes.js';
 import prodRoutes from './routes/prodRoutes.js';
 import catRoutes from './routes/catRoutes.js';
+import productRoutes from './routes/productRoutes.js';
 import verifyAuth from './middlewares/requireAuth.js';
 import verifyAdmin from './middlewares/requireAdmin.js';
+import authRoutes from './routes/authRoutes.js';
+import checkoutRoutes from "./routes/checkoutRoutes.js";
+
 
 import prisma from './config/prisma.js';
 import { requestLogger } from './middlewares/loggers.js';
@@ -15,11 +21,37 @@ import { errorHandler } from "./middlewares/errorHandlers.js";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./config/swagger.js";
 import cors from 'cors';
-
+import cookieParser from "cookie-parser";
+import helmet from "helmet";
+import compression from "compression"
 
 
 const app = express();
+app.disable('x-powered-by');
 const port = Number(process.env.PORT ?? 3000);
+//logger
+app.use(requestLogger)
+//HELMET. Securité (Current security policy. Cest pour eviter les scripts malveillants. on accepe que ce qui vient de chez nous => src == self)
+app.use(
+  helmet({
+    contentSecurityPolicy:
+      process.env.NODE_ENV === "production"
+        ? {
+            directives: {
+              defaultSrc: ["'self'"],
+              scriptSrc: ["'self'"],
+              styleSrc: ["'self'", "'unsafe-inline'"],
+              imgSrc: ["'self'", "data:"],
+            },
+          }
+        : false,
+  })
+);
+//compression des reponses
+app.use(compression())
+
+//redirection des 304 (sans ca, ca recharge a cbaque fois)
+app.set("etag", "strong");
 
 async function startServer() {
   try {
@@ -46,21 +78,16 @@ const corsOptions = {
   credentials: true,
 };
 
-if (process.env.NODE_ENV !== "production") {
-  // En développement : CORS permissif
-  app.use(cors());
-} else {
-  // En production : CORS restreint
-  app.use(cors(corsOptions));
-}
+app.use(cors(corsOptions));
 
 app.use(express.json());
 
-//logger
 
-app.use(requestLogger)
 
-// Mode test temporaire: on ne monte que les routes users
+//middleware express lit automatiquement les cookies envoyés par le navigateur et les met dans req.cookies
+//pas mal ce bazar
+app.use(cookieParser());
+
 app.use('/api/admin',verifyAuth,verifyAdmin,adminUserRoutes)
 app.use('/api/users', verifyAuth,userRoutes);
 app.use('/api/addresses', verifyAuth,addressRoutes);
@@ -68,9 +95,10 @@ app.use('/api/orders', verifyAuth,orderRoutes);
 app.use('/api/auth', authControllers)
 app.use('/api/products', prodRoutes);
 app.use('/api/categories', catRoutes);
+app.use('/api/produits', productRoutes);
+app.use('/api/auth/',verifyAuth,authRoutes);
+app.use("/api/checkout", verifyAuth, checkoutRoutes);
 
-app.use('/api/categories', catRoutes);
-app.use('/api/produits', prodRoutes);
 
 //app.use('/', rootRoutes);
 

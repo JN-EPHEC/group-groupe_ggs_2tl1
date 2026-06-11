@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function Footer() {
   return (
     <footer className="bg-black text-white px-10 pt-14 pb-8">
@@ -6,29 +8,29 @@ function Footer() {
         {/* Col 1 - Aide */}
         <div>
           <p className="text-[10px] tracking-[3px] uppercase text-gray-500 mb-5">Aide</p>
-          {["Contact", "FAQ", "Livraison", "Retours"].map((link) => (
-            <a
-              key={link}
-              href="#"
-              className="block text-sm text-white/60 hover:text-white mb-2.5 transition-colors duration-200"
-            >
-              {link}
-            </a>
-          ))}
+          <Link
+            to="/contact"
+            className="block text-sm text-white/60 hover:text-white mb-2.5 transition-colors duration-200"
+          >
+            Contact
+          </Link>
         </div>
 
         {/* Col 2 - Informations */}
         <div>
           <p className="text-[10px] tracking-[3px] uppercase text-gray-500 mb-5">Informations</p>
-          {["Qui sommes-nous", "Mentions légales", "CGV", "Confidentialité"].map((link) => (
-            <a
-              key={link}
-              href="#"
-              className="block text-sm text-white/60 hover:text-white mb-2.5 transition-colors duration-200"
-            >
-              {link}
-            </a>
-          ))}
+          <Link
+            to="/cgv"
+            className="block text-sm text-white/60 hover:text-white mb-2.5 transition-colors duration-200"
+          >
+            CGV
+          </Link>
+          <Link
+            to="/mentions-legales"
+            className="block text-sm text-white/60 hover:text-white mb-2.5 transition-colors duration-200"
+          >
+            Mentions légales
+          </Link>
         </div>
 
         {/* Col 3 - Brand */}

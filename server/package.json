@@ -9,10 +9,10 @@
   "moduleResolution": "node",
   "allowSyntheticDefaultImports": true,
   "scripts": {
-    "start": "tsx watch src/server.ts",
+    "start": "dotenv -e ../.env -- tsx watch src/server.ts",
     "start:prod": "node dist/server.js",
     "build": "tsc",
-    "dev": "tsx watch src/server.ts",
+    "dev": "dotenv -e ../.env -- tsx watch src/server.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
@@ -20,6 +20,7 @@
     "generate": "prisma generate --schema=../prisma/schema.prisma"
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/http-auth": "^4.1.4",
@@ -41,11 +42,17 @@
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
+    "compression": "^1.8.1",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
+    "dev3-backend-tp1": "file:..",
+    "dotenv": "^17.4.2",
+    "helmet": "^8.2.0",
     "http-auth": "^4.2.1",
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.20.0",
     "sqlite3": "^5.0.2",
+    "stripe": "^22.1.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
   }

@@ -3,20 +3,20 @@ import * as authControllers from '../controllers/authControllers';
 import { validateLoginBody, validateRegisterBody } from '../middlewares/validateAuthBody.js';
 
 const router = express.Router();
-
 /**
  * @swagger
  * tags:
  *   name: Auth
  *   description: Inscription et connexion
  */
-
+ 
 /**
  * @swagger
  * /api/auth/register:
  *   post:
  *     summary: Créer un compte
  *     tags: [Auth]
+ *     security: []
  *     requestBody:
  *       required: true
  *       content:
@@ -25,20 +25,20 @@ const router = express.Router();
  *             $ref: '#/components/schemas/RegisterInput'
  *     responses:
  *       201:
- *         description: Compte créé, token retourné
+ *         description: Compte créé
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/AuthResponse'
  *       400:
- *         description: Types invalides / format email / compte déjà existant
+ *         description: Types invalides, format email invalide ou compte déjà existant
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/register', validateRegisterBody, authControllers.authRegister);
 
+router.post('/register', validateRegisterBody, authControllers.authRegister);
 /**
  * @swagger
  * /api/auth/login:
@@ -54,13 +54,13 @@ router.post('/register', validateRegisterBody, authControllers.authRegister);
  *             $ref: '#/components/schemas/LoginInput'
  *     responses:
  *       200:
- *         description: Connexion réussie, token retourné
+ *         description: Connexion réussie
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/AuthResponse'
  *       400:
- *         description: Types invalides
+ *         description: Champs manquants ou format invalide
  *         content:
  *           application/json:
  *             schema:
@@ -74,9 +74,10 @@ router.post('/register', validateRegisterBody, authControllers.authRegister);
  */
 router.post('/login', validateLoginBody, authControllers.authLogin);
 
+
+
 //Permet au client de se déconnecter
-//router.post('/logout',authLogout);
+router.post('/logout', authControllers.authLogout);
 
 
 export default router;
-

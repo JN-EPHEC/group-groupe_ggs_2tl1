@@ -1,9 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
-
-const API_URL = import.meta.env.VITE_API_URL 
-
+import { Link, useNavigate } from "react-router-dom";
+import { flattenRoleNames, setStoredUser } from "../utils/auth";
 
 function Register() {
 // défition des variables d'état. [variable,fonction]
@@ -18,7 +16,7 @@ function Register() {
   const [state, setState] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [country, setCountry] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string | string[]>("");
   const [success, setSuccess] = useState("");
 
 //lors de la soumission du form, e.prevendefault, on connait, éviter de recharger la page. setError+ setSucces,remise a 0 des messages succes/erreur
@@ -27,18 +25,19 @@ function Register() {
     setError("");
     setSuccess("");
 //vérifier les 2 mots de passe.
-  let wrongPwd = ''
-     if(password.length < 8){ wrongPwd +='8 caracteres minimum '; }
-    if(!password.match(/[A-Z]/)){wrongPwd +='une majuscule '; }
-    if(!password.match(/[a-z]/)){wrongPwd +='une minuscule '; }
-    if(!password.match(/[0-9]/)){wrongPwd +='un nombre'; }
-    if(!password.match(/[!@#$%^&*(),.?":{}|<>_\-\\[\]\/+=]/)){wrongPwd +='un caractère spécial '; }
-    if (password !== confirmPassword) {setError("Les mots de passe ne correspondent pas.");return;}
-    if(wrongPwd.length > 0) {setError(wrongPwd); return}
+  let wrongPwd ="";
+    if(password.length < 8)      wrongPwd += "8 caractères minimum, ";
+    if(!password.match(/[A-Z]/))  wrongPwd += "une majuscule, ";
+    if(!password.match(/[a-z]/))  wrongPwd += "une minuscule, ";
+    if(!password.match(/[0-9]/))  wrongPwd += "un nombre, ";
+    if(!password.match(/[!@#$%^&*(),.?":{}|<>_\-\\[\]/+=]/)) wrongPwd += "un caractère spécial, ";
+    if (wrongPwd.length > 0) {
+  setError("Mot de passe invalide, votre mot de passe doit contenir : " + wrongPwd.slice(0, -2) + '.');return;} 
     try {
-      const response = await fetch(`${API_URL}/api/auth/register`, {
+      const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           username,
           email,
@@ -61,8 +60,24 @@ function Register() {
         throw new Error(data.message ?? "Impossible de creer le compte.");
       }
 
+      const user = data.user;
+      if (user && typeof user === "object") {
+        const idValue = (user as { id?: unknown }).id;
+        const usernameValue = (user as { username?: unknown }).username;
+        const emailValue = (user as { email?: unknown }).email;
+        const roleNames = flattenRoleNames((user as { roles?: unknown }).roles);
+
+        setStoredUser({
+          id: typeof idValue === "number" ? idValue : undefined,
+          username: typeof usernameValue === "string" ? usernameValue : undefined,
+          email: typeof emailValue === "string" ? emailValue : undefined,
+          roles: roleNames,
+          isAdmin: roleNames.some((name) => name.toLowerCase() === "admin"),
+        });
+      }
+
       setSuccess("Compte cree avec succes.");
-      setTimeout(() => navigate("/login"), 900);
+      setTimeout(() => navigate("/"), 900);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");
     } 
@@ -228,9 +243,9 @@ function Register() {
 
           <p className="text-center text-[9px] tracking-[2px] uppercase text-gray-400">
             Deja un compte ?{" "}
-            <a href="/login" className="text-black hover:opacity-40">
+            <Link to="/connexion" className="text-black hover:opacity-40">
               Se connecter
-            </a>
+            </Link>
           </p>
         </div>
       </div>

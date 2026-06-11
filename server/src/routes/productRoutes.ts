@@ -1,5 +1,6 @@
 import express from 'express';
 import { getProductById, getProducts } from '../controllers/productControllers.js';
+import checkIdParam from '../middlewares/checkIdParam.js';
 
 const router = express.Router();
 
@@ -9,6 +10,7 @@ const router = express.Router();
  *   get:
  *     summary: Récupère la liste paginée des produits
  *     tags: [Products]
+ *     security: []
  *     parameters:
  *       - in: query
  *         name: page
@@ -26,10 +28,12 @@ const router = express.Router();
  *         name: prix_min
  *         schema:
  *           type: number
+ *         description: Doit être >= 0
  *       - in: query
  *         name: prix_max
  *         schema:
  *           type: number
+ *         description: Doit être >= 0 et >= prix_min
  *       - in: query
  *         name: sort
  *         schema:
@@ -37,11 +41,17 @@ const router = express.Router();
  *           enum: [prix_asc, prix_desc, nom_asc, nom_desc]
  *     responses:
  *       200:
- *         description: Liste des produits
+ *         description: Liste paginée des produits
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ProductsPage'
  *       400:
- *         description: Paramètre de filtre ou tri invalide
- *       500:
- *         description: Erreur serveur
+ *         description: prix_min, prix_max ou sort invalide
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 router.get('/', getProducts);
 
@@ -51,6 +61,7 @@ router.get('/', getProducts);
  *   get:
  *     summary: Récupère le détail d'un produit
  *     tags: [Products]
+ *     security: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -60,13 +71,23 @@ router.get('/', getProducts);
  *     responses:
  *       200:
  *         description: Détail du produit
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Product'
  *       400:
  *         description: ID invalide
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  *       404:
  *         description: Produit introuvable
- *       500:
- *         description: Erreur serveur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
-router.get('/:id', getProductById);
+router.get('/:id', checkIdParam, getProductById);
 
 export default router;

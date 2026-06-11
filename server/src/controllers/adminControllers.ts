@@ -1,286 +1,316 @@
-import type {Request, Response, NextFunction } from 'express'
-import prisma from '../config/prisma.js'
+import type { Request, Response, NextFunction } from "express";
+import {
+  createCategoryAdmin,
+  deleteCategoryAdmin,
+  getAllCategoriesAdmin,
+  updateCategoryAdmin,
+} from "../services/adminCategoryServices.js";
+import { getAllOrdersAdmin, updateOrderStatusAdmin } from "../services/adminOrderServices.js";
+import {
+  createAdminUser,
+  createProductAdmin,
+  anonymizeUserAdmin,
+  deleteProductAdmin,
+  getProductAdmin,
+  getUserAdmin,
+  listProductsAdmin,
+  listUsersAdmin,
+  updateProductAdmin,
+  updateProductStockAdmin,
+  updateUserAdmin,
+} from "../services/adminServices.js";
 
-// ==================== Gestion des produits ====================
+const handleAdminError = (error: unknown, res: Response) => {
+  if (error instanceof Error && error.message === "PRODUCT_NOT_FOUND") {
+    return res.status(404).json({ message: "le produit n'existe pas ou plus" });
+  }
 
-// Permet de crééer un rpoduit
-export const createProduct = async (req:Request, res: Response, next: NextFunction) =>{
-    try{
-    const data = req.body
-     const product = await prisma.products.create({
-        data : data
-    });
+  if (error instanceof Error && error.message === "USER_NOT_FOUND") {
+    return res.status(404).json({ message: "Utilisateur introuvable" });
+  }
+
+  if (error instanceof Error && error.message === "NO_USER_DATA") {
+    return res.status(400).json({ message: "Aucune donnée à modifier" });
+  }
+
+  if (error instanceof Error && error.message === "ADMIN_ROLE_NOT_FOUND") {
+    return res.status(500).json({ message: "Le rôle admin n'existe pas" });
+  }
+
+  if (error instanceof Error && error.message === "USER_NOT_ADMIN") {
+    return res.status(403).json({ message: "Cet utilisateur n'est pas un admin" });
+  }
+
+  if (error instanceof Error && error.message === "CANNOT_DELETE_SELF") {
+    return res.status(403).json({ message: "Vous ne pouvez pas supprimer votre propre compte" });
+  }
+
+  if (error instanceof Error && error.message === "USER_ALREADY_ANONYMIZED") {
+    return res.status(409).json({ message: "Cet utilisateur est déjà anonymisé" });
+  }
+
+  if (error instanceof Error && error.message === "INVALID_STOCK") {
+    return res.status(400).json({ message: "La quantité doit être un entier supérieur ou égal à 0" });
+  }
+
+  if (error instanceof Error && error.message === "INVALID_PRODUCT_NAME") {
+    return res.status(400).json({ message: "Nom de produit invalide" });
+  }
+
+  if (error instanceof Error && error.message === "INVALID_PRODUCT_DESCRIPTION") {
+    return res.status(400).json({ message: "Description trop longue (max 2000 caractères)" });
+  }
+
+  if (error instanceof Error && error.message === "INVALID_PRODUCT_PRICE") {
+    return res.status(400).json({ message: "Prix invalide" });
+  }
+
+  if (error instanceof Error && error.message === "INVALID_PRODUCT_CATEGORY") {
+    return res.status(400).json({ message: "Catégorie invalide" });
+  }
+
+  if (error instanceof Error && error.message === "CATEGORY_NOT_FOUND") {
+    return res.status(404).json({ message: "Catégorie introuvable" });
+  }
+
+  if (error instanceof Error && error.message === "NO_PRODUCT_DATA") {
+    return res.status(400).json({ message: "Aucune donnée de produit à modifier" });
+  }
+
+  if (error instanceof Error && error.message === "INVALID_CATEGORY_NAME") {
+    return res.status(400).json({ message: "Nom de catégorie invalide" });
+  }
+
+  if (error instanceof Error && error.message === "CATEGORY_NAME_EXISTS") {
+    return res.status(409).json({ message: "Ce nom de catégorie existe déjà" });
+  }
+
+  if (error instanceof Error && error.message === "CATEGORY_HAS_PRODUCTS") {
+    return res.status(409).json({ message: "Impossible de supprimer une catégorie liée à des produits" });
+  }
+
+  if (error instanceof Error && error.message === "CATEGORY_NOT_FOUND") {
+    return res.status(404).json({ message: "Catégorie introuvable" });
+  }
+
+  if (error instanceof Error && error.message === "ORDER_NOT_FOUND") {
+    return res.status(404).json({ message: "Commande introuvable" });
+  }
+
+  if (error instanceof Error && error.message === "INVALID_ORDER_STATUS") {
+    return res.status(400).json({ message: "Statut de commande invalide" });
+  }
+
+  if (error instanceof Error && error.message === "INVALID_STATUS_TRANSITION") {
+    return res.status(400).json({ message: "Transition de statut non autorisée" });
+  }
+
+  if (error instanceof Error && error.message === "STATUS_NOT_FOUND") {
+    return res.status(500).json({ message: "Statut introuvable en base" });
+  }
+
+  return null;
+};
+
+export const getProduct = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const product = await getProductAdmin(Number(req.params.id));
+    return res.status(200).json(product);
+  } catch (error) {
+    const handled = handleAdminError(error, res);
+    if (handled) return handled;
+    return next(error);
+  }
+};
+
+export const listProducts = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const sort = typeof req.query.sort === "string" ? req.query.sort : undefined;
+    const products = await listProductsAdmin({ sort });
+
+    return res.status(200).json(products);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const updateProductStock = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const product = await updateProductStockAdmin(
+      Number(req.params.id),
+      req.body.quantite ?? req.body.stock
+    );
+
+    return res.status(200).json(product);
+  } catch (error) {
+    const handled = handleAdminError(error, res);
+    if (handled) return handled;
+
+    return next(error);
+  }
+};
+
+export const createProduct = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const product = await createProductAdmin(req.body);
+
     return res.status(201).json(product);
-    }catch(err){
-        next(err)
-    }
-}
+  } catch (error) {
+    return next(error);
+  }
+};
 
-// Permet de supprimer un produit
-export const deleteProduct = async (req:Request, res: Response, next:NextFunction) => {
-    try{
-    const id = req.params.id
-    const exists = await prisma.products.findUnique({where : {id : Number(id)}});
-    if (!exists){
-        return res.status(404).json({message : "le produit n'existe pas ou plus" })
-    }
-    const product = await prisma.products.delete({
-        where : {id : Number(id)},
-    });
-    return res.status(200).json(product)
-    } catch(err){
-        next(err)
-    }
+export const deleteProduct = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const product = await deleteProductAdmin(Number(req.params.id));
 
-}
+    return res.status(200).json(product);
+  } catch (error) {
+    const handled = handleAdminError(error, res);
+    if (handled) return handled;
 
-// Permet de modifier un produit
-export const modifyProduct = async (req:Request, res:Response,next :  NextFunction) => {
-    try{
-      const id = req.params.id
-        const exists = await prisma.products.findUnique({where:{id:Number(id)}});
-        if(!exists){
-            return res.status(404).json({message : "le produit n'existe pas ou plus" })
-        }
-        const data = req.body
-        const product = await prisma.products.update({
-        where : {id : Number(id)},
-        data : data
-    })
-    return res.status(200).json(product)
-    } catch(err){
-        next(err)
-    }
-}
+    return next(error);
+  }
+};
 
-// ==================== Gestion des utilisateurs ====================
+export const modifyProduct = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const product = await updateProductAdmin(Number(req.params.id), req.body);
 
-// Permet de récupérer tous les utlisateurs de la base de données
+    return res.status(200).json(product);
+  } catch (error) {
+    const handled = handleAdminError(error, res);
+    if (handled) return handled;
+
+    return next(error);
+  }
+};
+
 export const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const users = await prisma.user.findMany({
-            select: {
-                id: true,
-                username: true,
-                email: true,
-                created_at: true,
-                isActive: true,
-                roles: {
-                    select: {
-                        role: {
-                            select: {
-                                id: true,
-                                name: true,
-                            },
-                        },
-                    },
-                },
-            },
-        });
-        return res.status(200).json(users);
-    } catch (error) {
-        return next(error);
-    }
-}
+  try {
+    const search = typeof req.query.search === "string" ? req.query.search : undefined;
+    const pageParam = typeof req.query.page === "string" ? Number(req.query.page) : 1;
+    const page = Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
 
-// Permet de récupérer toutes les informations d'un utilisateurs
+    const result = await listUsersAdmin({ search, page });
+
+    return res.status(200).json(result);
+  } catch (error) {
+    return next(error);
+  }
+};
+
 export const getUser = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const userId = Number(req.params.id);
+  try {
+    const user = await getUserAdmin(Number(req.params.id));
 
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            select: {
-                id: true,
-                username: true,
-                email: true,
-                created_at: true,
-                isActive: true,
-                roles: {
-                    select: {
-                        role: {
-                            select: {
-                                id: true,
-                                name: true,
-                            },
-                        },
-                    },
-                },
-            },
-        });
+    return res.status(200).json(user);
+  } catch (error) {
+    const handled = handleAdminError(error, res);
+    if (handled) return handled;
 
-        if (!user) {
-            return res.status(404).json({ message: "Utilisateur introuvable" });
-        }
+    return next(error);
+  }
+};
 
-        return res.status(200).json(user);
-    } catch (error) {
-        return next(error);
-    }
-}
-
-// Permet de modifier un utilisateur
 export const modifyUser = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const userId = Number(req.params.id);
+  try {
+    const user = await updateUserAdmin(Number(req.params.id), req.body);
 
-        const exists = await prisma.user.findUnique({
-            where: { id: userId },
-        });
+    return res.status(200).json(user);
+  } catch (error) {
+    const handled = handleAdminError(error, res);
+    if (handled) return handled;
 
-        if (!exists) {
-            return res.status(404).json({ message: "Utilisateur introuvable" });
-        }
+    return next(error);
+  }
+};
 
-        const data: { username?: string; email?: string; isActive?: boolean } = {};
-
-        if (req.body.username !== undefined) data.username = req.body.username;
-        if (req.body.email !== undefined) data.email = req.body.email;
-        if (req.body.isActive !== undefined) data.isActive = req.body.isActive;
-
-        if (Object.keys(data).length === 0) {
-            return res.status(400).json({ message: "Aucune donnée à modifier" });
-        }
-
-        const user = await prisma.user.update({
-            where: { id: userId },
-            data,
-            select: {
-                id: true,
-                username: true,
-                email: true,
-                created_at: true,
-                isActive: true,
-                roles: {
-                    select: {
-                        role: {
-                            select: {
-                                id: true,
-                                name: true,
-                            },
-                        },
-                    },
-                },
-            },
-        });
-
-        return res.status(200).json(user);
-    } catch (error) {
-        return next(error);
-    }
-}
-
-// Permet de créer un admin
 export const createAdmin = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const data = req.body;
+  try {
+    const user = await createAdminUser(req.body);
 
-        // Récupérer le rôle "admin"
-        const adminRole = await prisma.role.findUnique({
-            where: { name: "admin" },
-        });
+    return res.status(201).json(user);
+  } catch (error) {
+    const handled = handleAdminError(error, res);
+    if (handled) return handled;
 
-        if (!adminRole) {
-            return res.status(500).json({ message: "Le rôle admin n'existe pas" });
-        }
+    return next(error);
+  }
+};
 
-        // Créer l'utilisateur et attribuer le rôle admin
-        const user = await prisma.user.create({
-            data: {
-                ...data,
-                roles: {
-                    create: {
-                        role_id: adminRole.id,
-                    },
-                },
-            },
-            select: {
-                id: true,
-                username: true,
-                email: true,
-                created_at: true,
-                isActive: true,
-                roles: {
-                    select: {
-                        role: {
-                            select: {
-                                id: true,
-                                name: true,
-                            },
-                        },
-                    },
-                },
-            },
-        });
-
-        return res.status(201).json(user);
-    } catch (error) {
-        return next(error);
-    }
-}
-
-// Permet de supprimer un admin
 export const deleteAdmin = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const userId = Number(req.params.id);
+  try {
+    const adminUserId = Number(req.user?.id);
+    const result = await anonymizeUserAdmin(Number(req.params.id), adminUserId);
 
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            select: {
-                id: true,
-                username: true,
-                email: true,
-                roles: {
-                    select: {
-                        role: {
-                            select: {
-                                name: true,
-                            },
-                        },
-                    },
-                },
-            },
-        });
+    return res.status(200).json(result);
+  } catch (error) {
+    const handled = handleAdminError(error, res);
+    if (handled) return handled;
 
-        if (!user) {
-            return res.status(404).json({ message: "Utilisateur introuvable" });
-        }
+    return next(error);
+  }
+};
 
-        // Vérifier que l'utilisateur a le rôle admin
-        const isAdmin = user.roles.some(userRole => userRole.role.name === "admin");
-        if (!isAdmin) {
-            return res.status(403).json({ message: "Cet utilisateur n'est pas un admin" });
-        }
+export const getAllCategories = async (_req: Request, res: Response, next: NextFunction) => {
+  try {
+    const categories = await getAllCategoriesAdmin();
+    return res.status(200).json(categories);
+  } catch (error) {
+    return next(error);
+  }
+};
 
-        // Supprimer l'utilisateur
-        const deletedUser = await prisma.user.delete({
-            where: { id: userId },
-            select: {
-                id: true,
-                username: true,
-                email: true,
-            },
-        });
-
-        return res.status(200).json({ message: "Admin supprimé", user: deletedUser });
-    } catch (error) {
-        return next(error);
-    }
-}
-
-// ==================== Gestion des catégories====================
-
-// Permet de créer une catégorie
 export const createCat = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const data = req.body;
+  try {
+    const category = await createCategoryAdmin(req.body);
+    return res.status(201).json(category);
+  } catch (error) {
+    const handled = handleAdminError(error, res);
+    if (handled) return handled;
+    return next(error);
+  }
+};
 
-        const category = await prisma.categories.create({
-            data: data,
-        });
+export const updateCat = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const category = await updateCategoryAdmin(Number(req.params.id), req.body);
+    return res.status(200).json(category);
+  } catch (error) {
+    const handled = handleAdminError(error, res);
+    if (handled) return handled;
+    return next(error);
+  }
+};
 
-        return res.status(201).json(category);
-    } catch (error) {
-        return next(error);
-    }
-}
+export const deleteCat = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const category = await deleteCategoryAdmin(Number(req.params.id));
+    return res.status(200).json(category);
+  } catch (error) {
+    const handled = handleAdminError(error, res);
+    if (handled) return handled;
+    return next(error);
+  }
+};
+
+export const getAllOrders = async (_req: Request, res: Response, next: NextFunction) => {
+  try {
+    const orders = await getAllOrdersAdmin();
+    return res.status(200).json(orders);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const updateOrderStatus = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const order = await updateOrderStatusAdmin(Number(req.params.id), req.body);
+    return res.status(200).json(order);
+  } catch (error) {
+    const handled = handleAdminError(error, res);
+    if (handled) return handled;
+    return next(error);
+  }
+};

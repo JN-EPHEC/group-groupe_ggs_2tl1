@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="10" fill="#f5eee3"/>
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle"
+        fill="#111" font-family="serif" font-size="22" letter-spacing="6"
+        style="font-weight:300; text-transform:uppercase;">
+    GGS
+  </text>
+</svg>
