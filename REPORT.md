@@ -17,8 +17,8 @@ L'application propose :
 
 Stack technique :
 - **Frontend** : React + TypeScript (Vite)
-- **Backend** : Node.js + Express + TypeScript
-- **Base de données** : MySQL via Prisma ORM
+- **Backend** : Node.js + Express + TypeScript + Prisma
+- **Base de données** : MySQL via Prisma ORM (Supabase)
 - **Déploiement** : Docker, Nginx, GitHub Actions
 
 ---
@@ -29,7 +29,7 @@ Stack technique :
 
 > *Code de base : Projet de Gregory*
 
-Nous avons retenu le code de **Gregory Ly**, car il avait une structure claire, refactorée et avec le moins de code smells.Il y avauit une séparation des couches métiers (Controllers/Services/Routes) dés le départ.
+Nous avons retenu le code de **Gregory Ly**, car il avait une structure claire, refactorée et avec le moins de code smells.Il y avait une séparation des couches métiers (Controllers/Services/Routes) dés le départ.
 
 
 ### Difficultés d'adaptation des autres membres
@@ -166,11 +166,25 @@ Nous avons retenu le code de **Gregory Ly**, car il avait une structure claire, 
 
 ## 4. Design Patterns utilisés
 
-### Repository / Service Pattern
+### Design Pattern
 
-**Où** : `server/src/services/productCatalogServices.ts`, et l'ensemble du dossier `services/`
+**Quoi** : `Patron de création`
 
-**Pourquoi** : séparer la logique métier (services) de la couche d'accès aux données (Prisma) et des routes HTTP (controllers). Cela facilite les tests unitaires et l'évolution du code.
+**Où** : `server/src/config/prisma.ts`
+
+**Pourquoi** : Utilisation d'un singleton pour créer une seule instance du client Prisma, pour la réutiliser dans toute l'application. Cela permet d'éviter plus connexions à la base de données.
+
+**Quoi** : `Patron structurel`
+
+**Où** : `server/src/services/`
+
+**Pourquoi** : Utilisation de patron de création pour que les controllers puissent récupérer des données sans connaître la logique métier. Cema rends le code plus lisible et plus facillement maintenable et testable.
+
+**Quoi** : `Chain of Responsability`
+
+**Où** : `server/src/server.ts`
+
+**Pourquoi** : Chaque middleware a une responsabilité précise. Si une étape échoue, la chaîne s’arrête et une réponse est renvoyée. Sinon, le middleware appelle next() pour passer au suivant. Cela permet de composer facilement les traitements d’une requête.
 
 ```
 Route → Controller → Service → Prisma (DB)
@@ -182,20 +196,15 @@ Route → Controller → Service → Prisma (DB)
 
 **Pourquoi** : organiser le code de façon lisible et maintenable, chaque couche ayant une responsabilité unique.
 
-### Singleton
-
-**Où** : instance Prisma Client (`prisma/client.ts`)
-
-**Pourquoi** : éviter de créer plusieurs connexions à la base de données, Prisma Client est instancié une seule fois et réutilisé dans toute l'application.
-
-> *(À compléter selon les patterns réellement présents dans votre code)*
-
 ---
 
 ## 5. Couverture de tests (Coverage)
 
-> *(Insérer ici une capture d'écran du rapport de couverture)*
+![Coverage Report](image-1.png)
 
-![Coverage Report](./coverage-screenshot.png)
+Le rapport de couverture montre une couverture globale satisfaisante côté serveur : **90,47 %** des instructions sont couvertes, **95,45 %** des fonctions sont testées et **81,27 %** des branches conditionnelles sont couvertes.
 
-> *(À compléter avec un commentaire sur les résultats : taux de couverture global, fichiers bien/mal couverts, etc.)*
+Les fichiers les mieux couverts sont principalement les middlewares de validation, les routes produits et plusieurs services métier comme `authService.ts`, `catServices.ts`, `prodServices.ts` et `userServices.ts`, qui atteignent **100 %** de couverture. Cela montre que les fonctionnalités principales comme l'authentification, les produits, les catégories et les utilisateurs sont bien testées.
+
+Les fichiers moins bien couverts sont surtout `adminCategoryServices.ts` avec environ **58 %**, `errorHandlers.ts` avec **60 %**, ainsi que certains controllers ou services admin.
+

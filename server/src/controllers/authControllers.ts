@@ -1,22 +1,25 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction, CookieOptions } from 'express';
 import { registerUser, loginUser } from "../services/authService.js";
+
+const accessTokenCookieOptions: CookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 60 * 60 * 1000,
+};
+
+const clearAccessTokenCookieOptions: CookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+};
 
 //Permet de créer un utilisateur
 export const authRegister = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const result = await registerUser(req.body);
 
-        res.cookie("accessToken", result.token, { //crée un cookie nommé accesToken
-            //cookie non lisible coté frontend
-            httpOnly: true,
-            //si en prod, true --> envoyé uniquement en https
-            secure: process.env.NODE_ENV === "production",
-            //protege contre le cross site
-            // process.env.NODE_ENV === "production" ? "none" :
-            sameSite: "lax",
-            //expire après 1h comme le jwt
-            maxAge: 60 * 60 * 1000,
-        });
+        res.cookie("accessToken", result.token, accessTokenCookieOptions);
 
         return res.status(201).json({
             user: result.user,
@@ -35,16 +38,7 @@ export const authLogin = async (req: Request, res: Response, next: NextFunction)
     try {
         const result = await loginUser(req.body);
 
-        res.cookie("accessToken", result.token, { //crée un cookie nommé accesToken
-            //cookie non lisible coté frontend
-            httpOnly: true,
-            //si en prod, true --> envoyé uniquement en https
-            secure: process.env.NODE_ENV === "production",
-            //protege contre le cross site
-            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-            //expire après 1h comme le jwt
-            maxAge: 60 * 60 * 1000,
-        });
+        res.cookie("accessToken", result.token, accessTokenCookieOptions);
 
         return res.status(200).json({
             user: result.user,
@@ -62,11 +56,7 @@ export const authLogin = async (req: Request, res: Response, next: NextFunction)
 };
 
 export const authLogout = async (_req: Request, res: Response) => {
-    res.clearCookie("accessToken", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    });
+    res.clearCookie("accessToken", clearAccessTokenCookieOptions);
 
     return res.status(204).send();
 };
