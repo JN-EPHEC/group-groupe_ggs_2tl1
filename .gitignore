@@ -11,3 +11,4 @@ dist/
 dev.err.log
 dev.out.log
 scripts/
+*.log
