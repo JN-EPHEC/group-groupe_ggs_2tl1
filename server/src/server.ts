@@ -27,6 +27,7 @@ import compression from "compression"
 
 
 const app = express();
+app.disable('x-powered-by');
 const port = Number(process.env.PORT ?? 3000);
 //logger
 app.use(requestLogger)

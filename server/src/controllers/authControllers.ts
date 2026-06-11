@@ -12,7 +12,8 @@ export const authRegister = async (req: Request, res: Response, next: NextFuncti
             //si en prod, true --> envoyé uniquement en https
             secure: process.env.NODE_ENV === "production",
             //protege contre le cross site
-            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+            // process.env.NODE_ENV === "production" ? "none" :
+            sameSite: "lax",
             //expire après 1h comme le jwt
             maxAge: 60 * 60 * 1000,
         });
